@@ -20,6 +20,7 @@
 package org.sonar.application.config;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -110,7 +111,7 @@ public class JdbcSettings implements Consumer<Props> {
   }
 
   private static String buildH2JdbcUrl(int embeddedDatabasePort) {
-    return "jdbc:h2:tcp://localhost:" + embeddedDatabasePort + "/sonar";
+    return "jdbc:h2:tcp://" + InetAddress.getLoopbackAddress().getHostAddress() + ":" + embeddedDatabasePort + "/sonar";
   }
 
   void checkUrlParameters(Provider provider, String url) {
