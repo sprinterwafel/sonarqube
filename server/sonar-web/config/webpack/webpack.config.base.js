@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const paths = require('../paths');
 
@@ -94,5 +95,15 @@ module.exports = {
       { test: require.resolve('react'), loader: 'expose-loader?React' },
       { test: require.resolve('react-dom'), loader: 'expose-loader?ReactDOM' }
     ]
-  }
+  },
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      // this ensures that no other module goes into the vendor chunk
+      // except explicitly declared ones
+      minChunks: Infinity
+    }),
+
+    new webpack.EnvironmentPlugin(['NODE_ENV'])
+  ]
 };

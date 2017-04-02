@@ -17,27 +17,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const config = require('./webpack.config.base');
 const paths = require('../paths');
 
-// Don't attempt to continue if there are any errors.
-config.bail = true;
+module.exports = Object.assign({}, config, {
+  // Don't attempt to continue if there are any errors.
+  bail: true,
 
-config.plugins = [
-  new webpack.optimize.CommonsChunkPlugin({ name: 'vendor' }),
+  plugins: [
+    ...config.plugins,
 
-  new ExtractTextPlugin({
-    filename: 'css/sonar.[chunkhash:8].css',
-    allChunks: true
-  }),
+    new ExtractTextPlugin({
+      filename: 'css/sonar.[chunkhash:8].css',
+      allChunks: true
+    }),
 
-  new HtmlWebpackPlugin({
-    inject: false,
-    template: paths.appHtml
-  })
-];
-
-module.exports = config;
+    new HtmlWebpackPlugin({
+      inject: false,
+      template: paths.appHtml
+    })
+  ]
+});

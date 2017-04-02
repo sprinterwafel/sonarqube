@@ -21,71 +21,60 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const config = require('./webpack.config.base');
-const getClientEnvironment = require('../env');
 const paths = require('../paths');
-
-// Get environment variables to inject into our app.
-const env = getClientEnvironment();
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
-if (env['process.env.NODE_ENV'] !== '"production"') {
+if (process.env.NODE_ENV !== 'production') {
   throw new Error('Production builds must have NODE_ENV=production.');
 }
 
-// Don't attempt to continue if there are any errors.
-config.bail = true;
+module.exports = Object.assign({}, config, {
+  // Don't attempt to continue if there are any errors.
+  bail: true,
 
-config.plugins = [
-  new webpack.optimize.CommonsChunkPlugin({ name: 'vendor' }),
+  plugins: [
+    ...config.plugins,
 
-  new ExtractTextPlugin({
-    filename: 'css/sonar.[chunkhash:8].css',
-    allChunks: true
-  }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false
+    }),
 
-  new HtmlWebpackPlugin({
-    inject: false,
-    template: paths.appHtml,
-    minify: {
-      removeComments: true,
-      collapseWhitespace: true,
-      removeRedundantAttributes: true,
-      useShortDoctype: true,
-      removeEmptyAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      keepClosingSlash: true,
-      minifyJS: true,
-      minifyCSS: true,
-      minifyURLs: true
-    }
-  }),
+    new ExtractTextPlugin({
+      filename: 'css/sonar.[chunkhash:8].css',
+      allChunks: true
+    }),
 
-  // Makes some environment variables available to the JS code, for example:
-  // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
-  // It is absolutely essential that NODE_ENV was set to production here.
-  // Otherwise React will be compiled in the very slow development mode.
-  new webpack.DefinePlugin(env),
+    new HtmlWebpackPlugin({
+      inject: false,
+      template: paths.appHtml,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true
+      }
+    }),
 
-  new webpack.LoaderOptionsPlugin({
-    minimize: true,
-    debug: false
-  }),
-
-  // Minify the code.
-  new webpack.optimize.UglifyJsPlugin({
-    compress: {
-      screw_ie8: true, // React doesn't support IE8
-      warnings: false
-    },
-    mangle: {
-      screw_ie8: true
-    },
-    output: {
-      comments: false,
-      screw_ie8: true
-    }
-  })
-];
-
-module.exports = config;
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        screw_ie8: true,
+        warnings: false
+      },
+      mangle: {
+        screw_ie8: true
+      },
+      output: {
+        comments: false,
+        screw_ie8: true
+      }
+    })
+  ]
+});
