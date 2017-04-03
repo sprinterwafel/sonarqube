@@ -18,24 +18,20 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package org.sonar.ce.taskprocessor;
+package org.sonar.ce;
 
 import java.util.Set;
 
 /**
- * A factory that will create the CeWorkerFactory with an UUID
+ * CeDistributedInformation is the interface to be implemented in order
+ * to implement information shared by all CE nodes
  */
-public interface CeWorkerFactory {
-  /**
-   * Create a new CeWorker object.
-   * Each {@link CeWorker} returned by this method will have a different UUID from the others and all of these UUIDS will be returned by {@link #getWorkerUUIDs()}.
-   *
-   * @return the CeWorker
-   */
-  CeWorker create();
-  /**
-   *
-   * @return  the UUIDs of each {@link CeWorker} object returned by {@link #create}.
-   */
+public interface CeDistributedInformation {
   Set<String> getWorkerUUIDs();
+
+  /**
+   * This method must be called once the workers of the current Compute Engine node
+   * are up so that they are shared with other Compute Engine nodes
+   */
+  void broadcastWorkerUUIDs();
 }

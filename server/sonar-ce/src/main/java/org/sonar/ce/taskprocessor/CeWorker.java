@@ -29,12 +29,5 @@ import org.sonar.ce.queue.CeTask;
  * {@code false} otherwise.
  */
 public interface CeWorker extends Callable<Boolean> {
-
-  /**
-   * UUID of the worker.
-   * The fact that this UUID is unique across a SQ cluster and over time is mandatory for CE nodes to work correctly.
-   *
-   * @return the uuid
-   */
   String getUUID();
 }

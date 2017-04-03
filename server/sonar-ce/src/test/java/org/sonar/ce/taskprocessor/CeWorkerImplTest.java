@@ -234,7 +234,7 @@ public class CeWorkerImplTest {
 
   private void verifyWorkerUuid() {
     verify(queue).peek(workerUuid.capture());
-    assertThat(workerUuid.getValue()).startsWith("uuid");
+    assertThat(workerUuid.getValue()).startsWith(workerUuid.getValue());
   }
 
   private static CeTask createCeTask(@Nullable String submitterLogin) {

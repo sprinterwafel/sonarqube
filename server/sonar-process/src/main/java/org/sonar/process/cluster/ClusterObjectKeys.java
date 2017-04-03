@@ -18,24 +18,35 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package org.sonar.ce.taskprocessor;
-
-import java.util.Set;
+package org.sonar.process.cluster;
 
 /**
- * A factory that will create the CeWorkerFactory with an UUID
+ * This interface holds all object keys accessible via Hazelcast
  */
-public interface CeWorkerFactory {
+public interface ClusterObjectKeys {
+
   /**
-   * Create a new CeWorker object.
-   * Each {@link CeWorker} returned by this method will have a different UUID from the others and all of these UUIDS will be returned by {@link #getWorkerUUIDs()}.
-   *
-   * @return the CeWorker
+   * The key of replicated map that hold all operational processes
    */
-  CeWorker create();
+  String OPERATIONAL_PROCESSES = "OPERATIONAL_PROCESSES";
   /**
-   *
-   * @return  the UUIDs of each {@link CeWorker} object returned by {@link #create}.
+   * The key of atomic reference holding the leader UUID
    */
-  Set<String> getWorkerUUIDs();
+  String LEADER = "LEADER";
+  /**
+   * The key of the hostname attribute of a member
+   */
+  String HOSTNAME = "HOSTNAME";
+  /**
+   * The key of atomic reference holding the SonarQube version of the cluster
+   */
+  String SONARQUBE_VERSION = "SONARQUBE_VERSION";
+  /**
+   * The key of the Set holding the UUIDs of clients
+   */
+  String CLIENT_UUIDS = "CLIENT_UUIDS";
+  /**
+   * The key of replicated map holding the CeWorker UUIDs
+   */
+  String WORKER_UUIDS = "WORKER_UUIDS";
 }

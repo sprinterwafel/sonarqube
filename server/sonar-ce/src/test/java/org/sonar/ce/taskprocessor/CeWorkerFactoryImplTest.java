@@ -64,7 +64,7 @@ public class CeWorkerFactoryImplTest {
   public void CeWorkerFactory_must_returns_the_uuids_of_worker() {
     Set<String> ceWorkerUUIDs = new HashSet<>();
 
-    for(int i=0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
       ceWorkerUUIDs.add(underTest.create().getUUID());
     }
 

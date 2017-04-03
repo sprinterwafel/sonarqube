@@ -20,7 +20,6 @@
 package org.sonar.ce.taskprocessor;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
@@ -64,11 +63,10 @@ public class CeWorkerImpl implements CeWorker {
     return true;
   }
 
-  private static final AtomicLong counter = new AtomicLong(0);
 
   private Optional<CeTask> tryAndFindTaskToExecute() {
     try {
-      return queue.peek("uuid" + counter.addAndGet(100));
+      return queue.peek(uuid);
     } catch (Exception e) {
       LOG.error("Failed to pop the queue of analysis reports", e);
     }
@@ -143,5 +141,4 @@ public class CeWorkerImpl implements CeWorker {
       profiler.addContext("submitter", submitterLogin);
     }
   }
-
 }

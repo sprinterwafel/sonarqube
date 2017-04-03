@@ -17,25 +17,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+@ParametersAreNonnullByDefault
+package org.sonar.process.cluster;
 
-package org.sonar.ce.taskprocessor;
-
-import java.util.Set;
-
-/**
- * A factory that will create the CeWorkerFactory with an UUID
- */
-public interface CeWorkerFactory {
-  /**
-   * Create a new CeWorker object.
-   * Each {@link CeWorker} returned by this method will have a different UUID from the others and all of these UUIDS will be returned by {@link #getWorkerUUIDs()}.
-   *
-   * @return the CeWorker
-   */
-  CeWorker create();
-  /**
-   *
-   * @return  the UUIDs of each {@link CeWorker} object returned by {@link #create}.
-   */
-  Set<String> getWorkerUUIDs();
-}
+import javax.annotation.ParametersAreNonnullByDefault;
