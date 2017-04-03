@@ -19,11 +19,22 @@
  */
 package org.sonar.ce.taskprocessor;
 
-import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-import org.sonar.server.util.StoppableExecutorService;
+import java.util.concurrent.Callable;
+import org.sonar.ce.queue.CeQueue;
+import org.sonar.ce.queue.CeTask;
 
 /**
- * The {@link java.util.concurrent.ExecutorService} responsible for running {@link CeWorkerImpl}.
+ * Marker interface of the runnable in charge of polling the {@link CeQueue} and executing {@link CeTask}.
+ * {@link Callable#call()} returns a Boolean which is {@code true} when some a {@link CeTask} was processed,
+ * {@code false} otherwise.
  */
-public interface CeProcessingSchedulerExecutorService extends StoppableExecutorService, ListeningScheduledExecutorService {
+public interface CeWorker extends Callable<Boolean> {
+
+  /**
+   * UUID of the worker.
+   * The fact that this UUID is unique across a SQ cluster and over time is mandatory for CE nodes to work correctly.
+   *
+   * @return the uuid
+   */
+  String getUUID();
 }

@@ -33,18 +33,20 @@ import org.sonar.db.ce.CeActivityDto;
 
 import static java.lang.String.format;
 
-public class CeWorkerCallableImpl implements CeWorkerCallable {
+public class CeWorkerImpl implements CeWorker {
 
-  private static final Logger LOG = Loggers.get(CeWorkerCallableImpl.class);
+  private static final Logger LOG = Loggers.get(CeWorkerImpl.class);
 
   private final InternalCeQueue queue;
   private final CeLogging ceLogging;
   private final CeTaskProcessorRepository taskProcessorRepository;
+  private final String uuid;
 
-  public CeWorkerCallableImpl(InternalCeQueue queue, CeLogging ceLogging, CeTaskProcessorRepository taskProcessorRepository) {
+  public CeWorkerImpl(InternalCeQueue queue, CeLogging ceLogging, CeTaskProcessorRepository taskProcessorRepository, String uuid) {
     this.queue = queue;
     this.ceLogging = ceLogging;
     this.taskProcessorRepository = taskProcessorRepository;
+    this.uuid = uuid;
   }
 
   @Override
@@ -63,6 +65,7 @@ public class CeWorkerCallableImpl implements CeWorkerCallable {
   }
 
   private static final AtomicLong counter = new AtomicLong(0);
+
   private Optional<CeTask> tryAndFindTaskToExecute() {
     try {
       return queue.peek("uuid" + counter.addAndGet(100));
@@ -70,6 +73,11 @@ public class CeWorkerCallableImpl implements CeWorkerCallable {
       LOG.error("Failed to pop the queue of analysis reports", e);
     }
     return Optional.empty();
+  }
+
+  @Override
+  public String getUUID() {
+    return uuid;
   }
 
   private void executeTask(CeTask task) {
