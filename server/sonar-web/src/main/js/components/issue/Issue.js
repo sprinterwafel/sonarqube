@@ -31,7 +31,7 @@ type Props = {
   checked?: boolean,
   issue: IssueType | Model,
   onCheck?: () => void,
-  onClick: () => void,
+  onClick: (string) => void,
   onFilterClick?: () => void,
   onIssueChange: ({}) => void,
   selected: boolean

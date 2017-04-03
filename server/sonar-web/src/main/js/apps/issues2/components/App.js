@@ -1,0 +1,248 @@
+/*
+ * SonarQube
+ * Copyright (C) 2009-2017 SonarSource SA
+ * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+// @flow
+import React from 'react';
+import Helmet from 'react-helmet';
+import { keyBy } from 'lodash';
+import Sidebar from '../sidebar/Sidebar';
+import IssuesListContainer from './IssuesListContainer';
+import { parseQuery, areQueriesEqual, getOpen, serializeQuery, parseFacets } from '../utils';
+import type { Query, Facet } from '../utils';
+import IssuesSourceViewerContainer from './IssuesSourceViewerContainer';
+import ListFooter from '../../../components/controls/ListFooter';
+import { translate } from '../../../helpers/l10n';
+import { formatMeasure } from '../../../helpers/measures';
+
+type Props = {
+  fetchIssues: () => Promise<*>,
+  location: { pathname: string, query: { [string]: string } },
+  router: { push: () => void }
+};
+
+type State = {
+  facets: { [string]: Facet },
+  issues?: Array<string>,
+  loading: boolean,
+  openFacets: { [string]: boolean },
+  paging?: {
+    pageIndex: number,
+    pageSize: number,
+    total: number
+  },
+  query?: Query,
+  referencedRules: { [string]: { name: string } },
+  selected?: string
+};
+
+export default class App extends React.PureComponent {
+  mounted: boolean;
+  props: Props;
+  state: State;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      facets: {},
+      loading: true,
+      openFacets: { resolutions: true, types: true },
+      query: parseQuery(props.location.query),
+      referencedRules: {},
+      selected: getOpen(props.location.query)
+    };
+  }
+
+  componentDidMount() {
+    this.mounted = true;
+
+    const footer = document.getElementById('footer');
+    if (footer) {
+      footer.classList.add('search-navigator-footer');
+    }
+
+    this.fetchFirstIssues();
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    const open = getOpen(nextProps.location.query);
+    if (open != null && open !== this.state.selected) {
+      this.setState({ selected: open });
+    }
+    this.setState({ query: parseQuery(nextProps.location.query) });
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (!areQueriesEqual(prevProps.location.query, this.props.location.query)) {
+      this.fetchFirstIssues();
+    }
+  }
+
+  componentWillUnmount() {
+    const footer = document.getElementById('footer');
+    if (footer) {
+      footer.classList.remove('search-navigator-footer');
+    }
+
+    this.mounted = false;
+  }
+
+  fetchIssues(additional?: {}): Promise<*> {
+    const { query } = this.state;
+
+    if (!query) {
+      return Promise.reject();
+    }
+
+    const parameters = {
+      ...serializeQuery(query),
+      ps: 25,
+      facets: ['types', 'resolutions', 'severities', 'statuses', 'rules'].join(),
+      ...additional
+    };
+
+    this.setState({ loading: true });
+
+    return this.props.fetchIssues(parameters);
+  }
+
+  fetchFirstIssues() {
+    this.fetchIssues().then(response => {
+      if (this.mounted) {
+        const issues = response.issues.map(issue => issue.key);
+        this.setState({
+          facets: parseFacets(response.facets),
+          loading: false,
+          issues,
+          paging: response.paging,
+          referencedRules: keyBy(response.rules, 'key'),
+          selected: issues.length > 0 ? issues[0] : undefined
+        });
+      }
+    });
+  }
+
+  fetchMoreIssues = () => {
+    const { paging } = this.state;
+
+    if (!paging) {
+      return;
+    }
+
+    const p = paging.pageIndex + 1;
+
+    this.fetchIssues({ p }).then(response => {
+      if (this.mounted) {
+        const issues = response.issues.map(issue => issue.key);
+        this.setState(state => ({
+          loading: false,
+          issues: [...state.issues, ...issues],
+          paging: response.paging
+        }));
+      }
+    });
+  };
+
+  handleIssueClick = (issue: string) => {
+    if (this.state.query) {
+      this.props.router.push({
+        pathname: this.props.location.pathname,
+        query: { ...serializeQuery(this.state.query), open: issue }
+      });
+    }
+  };
+
+  handleFilterChange = (changes: {}) => {
+    if (this.state.query) {
+      this.props.router.push({
+        pathname: this.props.location.pathname,
+        query: serializeQuery({ ...this.state.query, ...changes })
+      });
+    }
+  };
+
+  handleFacetToggle = (property: string) => {
+    this.setState(state => ({
+      openFacets: { ...state.openFacets, [property]: !state.openFacets[property] }
+    }));
+  };
+
+  render() {
+    const { issues, paging, query, selected } = this.state;
+
+    const open = getOpen(this.props.location.query);
+    const openIssue = issues != null && issues.includes(open) ? open : null;
+
+    return (
+      <div id="issues-page" className="page page-limited">
+        <Helmet title={translate('issues.page')} titleTemplate="%s - SonarQube" />
+
+        <div className="page-with-sidebar page-with-left-sidebar">
+          <Sidebar
+            facets={this.state.facets}
+            onFacetToggle={this.handleFacetToggle}
+            onFilterChange={this.handleFilterChange}
+            openFacets={this.state.openFacets}
+            query={query}
+            referencedRules={this.state.referencedRules}
+          />
+
+          <div className="page-main">
+            <header className="page-header">
+              <div className="page-actions">
+                {this.state.loading && <i className="spinner spacer-right" />}
+                {paging != null &&
+                  <span>
+                    <strong>{formatMeasure(paging.total, 'INT')}</strong> issues
+                  </span>}
+              </div>
+            </header>
+
+            {JSON.stringify(query)}
+
+            {issues != null &&
+              <div>
+                {openIssue != null &&
+                  <IssuesSourceViewerContainer
+                    issue={openIssue}
+                    displayAllIssues={true}
+                    onIssueSelect={this.handleIssueClick}
+                  />}
+
+                <div className={openIssue != null ? 'hidden' : undefined}>
+                  <IssuesListContainer
+                    issues={issues}
+                    loadMore={this.fetchMoreIssues}
+                    onIssueClick={this.handleIssueClick}
+                    selected={selected}
+                  />
+
+                  {paging != null &&
+                    <ListFooter
+                      total={paging.total}
+                      count={issues.length}
+                      loadMore={this.fetchMoreIssues}
+                    />}
+                </div>
+              </div>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
