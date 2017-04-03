@@ -58,8 +58,7 @@ public class CeHttpServer {
     this.processProps = processProps;
     this.actions = actions;
     this.actionRegistry = new ActionRegistryImpl();
-    InetAddress loopbackAddress = InetAddress.getByName(null);
-    this.nanoHttpd = new CeNanoHttpd(loopbackAddress.getHostAddress(), 0, actionRegistry);
+    this.nanoHttpd = new CeNanoHttpd(InetAddress.getLoopbackAddress().getHostAddress(), 0, actionRegistry);
   }
 
   // do not rename. This naming convention is required for picocontainer.
