@@ -75,11 +75,12 @@ export function getComponentTree(
   additional?: Object = {}
 ) {
   const url = '/api/measures/component_tree';
-  const data = Object.assign({}, additional, {
+  const data = {
     baseComponentKey: componentKey,
     metricKeys: metrics.join(','),
-    strategy
-  });
+    strategy,
+    additional
+  };
   return getJSON(url, data);
 }
 
@@ -170,13 +171,7 @@ export const getComponentForSourceViewer = (component: string): Promise<*> =>
   getJSON('/api/components/app', { component });
 
 export const getSources = (component: string, from?: number, to?: number): Promise<Array<*>> => {
-  const data: Object = { key: component };
-  if (from) {
-    Object.assign(data, { from });
-  }
-  if (to) {
-    Object.assign(data, { to });
-  }
+  const data: Object = { key: component, from, to };
   return getJSON('/api/sources/lines', data).then(r => r.sources);
 };
 

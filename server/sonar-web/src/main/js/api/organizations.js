@@ -24,7 +24,7 @@ import type { Organization } from '../store/organizations/duck';
 export const getOrganizations = (organizations?: Array<string>) => {
   const data = {};
   if (organizations) {
-    Object.assign(data, { organizations: organizations.join() });
+    data.organizations = organizations.join();
   }
   return getJSON('/api/organizations/search', data);
 };
@@ -39,13 +39,11 @@ type GetOrganizationNavigation = {
   isDefault: boolean
 };
 
-export const getOrganization = (key: string): Promise<GetOrganizationType> => {
-  return getOrganizations([key]).then(r => r.organizations.find(o => o.key === key));
-};
+export const getOrganization = (key: string): Promise<GetOrganizationType> =>
+  getOrganizations([key]).then(r => r.organizations.find(o => o.key === key));
 
-export const getOrganizationNavigation = (key: string): Promise<GetOrganizationNavigation> => {
-  return getJSON('/api/navigation/organization', { organization: key }).then(r => r.organization);
-};
+export const getOrganizationNavigation = (key: string): Promise<GetOrganizationNavigation> =>
+  getJSON('/api/navigation/organization', { organization: key }).then(r => r.organization);
 
 export const createOrganization = (fields: {}): Promise<Organization> =>
   postJSON('/api/organizations/create', fields).then(r => r.organization);

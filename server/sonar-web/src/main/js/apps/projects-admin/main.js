@@ -54,15 +54,13 @@ export default React.createClass({
   },
 
   getFilters() {
-    const filters = { ps: PAGE_SIZE };
+    const filters = {
+      ps: PAGE_SIZE,
+      q: this.state.query,
+      organization: this.props.organization && this.props.organization.key
+    };
     if (this.state.page !== 1) {
       filters.p = this.state.page;
-    }
-    if (this.state.query) {
-      filters.q = this.state.query;
-    }
-    if (this.props.organization) {
-      filters.organization = this.props.organization.key;
     }
     return filters;
   },
@@ -192,10 +190,10 @@ export default React.createClass({
   deleteProjects() {
     this.setState({ ready: false });
     const projects = this.state.selection.join(',');
-    const data = { projects };
-    if (this.props.organization) {
-      Object.assign(data, { organization: this.props.organization.key });
-    }
+    const data = {
+      projects,
+      organization: this.props.organization && this.props.organization.key
+    };
     deleteComponents(data).then(() => {
       this.setState({ page: 1, selection: [] }, this.requestProjects);
     });

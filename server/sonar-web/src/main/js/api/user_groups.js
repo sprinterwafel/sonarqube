@@ -22,13 +22,7 @@ import { getJSON, post } from '../helpers/request';
 
 export function searchUsersGroups(query?: string, organization?: string) {
   const url = '/api/user_groups/search';
-  const data: { q?: string, organization?: string } = {};
-  if (query) {
-    data.q = query;
-  }
-  if (organization) {
-    data.organization = organization;
-  }
+  const data: { q?: string, organization?: string } = { q: query, organization };
   return getJSON(url, data);
 }
 

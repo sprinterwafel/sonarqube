@@ -22,13 +22,8 @@ import { getJSON, post } from '../helpers/request';
 
 export const getActivity = (data?: Object): Promise<*> => getJSON('/api/ce/activity', data);
 
-export const getStatus = (componentId?: string): Promise<*> => {
-  const data = {};
-  if (componentId) {
-    Object.assign(data, { componentId });
-  }
-  return getJSON('/api/ce/activity_status', data);
-};
+export const getStatus = (componentId?: string): Promise<*> =>
+  getJSON('/api/ce/activity_status', { componentId });
 
 export const getTask = (id: string, additionalFields?: Array<string>): Promise<*> =>
   getJSON('/api/ce/task', { id, additionalFields }).then(r => r.task);
