@@ -20,58 +20,48 @@
 package org.sonar.process;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.net.ServerSocket;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class NetworkUtils {
 
-  private static final RandomPortFinder RANDOM_PORT_FINDER = new RandomPortFinder();
+  private static final Set<Integer> ALREADY_ALLOCATED = new HashSet<>();
+  private static final int MAX_TRIES = 50;
 
   private NetworkUtils() {
-    // only statics
+    // prevent instantiation
   }
 
-  public static int freePort() {
-    return RANDOM_PORT_FINDER.getNextAvailablePort();
+  public static int getNextAvailablePort(InetAddress address) {
+    return getNextAvailablePort(address, PortAllocator.INSTANCE);
   }
 
-  static class RandomPortFinder {
-    private static final int MAX_TRY = 10;
-    // Firefox blocks some reserved ports : http://www-archive.mozilla.org/projects/netlib/PortBanning.html
-    private static final int[] BLOCKED_PORTS = {2049, 4045, 6000};
-
-    public int getNextAvailablePort() {
-      for (int i = 0; i < MAX_TRY; i++) {
-        try {
-          int port = getRandomUnusedPort();
-          if (isValidPort(port)) {
-            return port;
-          }
-        } catch (Exception e) {
-          throw new IllegalStateException("Can't find an open network port", e);
-        }
+  static int getNextAvailablePort(InetAddress address, PortAllocator portAllocator) {
+    for (int i = 0; i < MAX_TRIES; i++) {
+      int port = portAllocator.getAvailable(address);
+      if (isValidPort(port)) {
+        ALREADY_ALLOCATED.add(port);
+        return port;
       }
-
-      throw new IllegalStateException("Can't find an open network port");
     }
+    throw new IllegalStateException("Fail to find an available port on " + address);
+  }
 
-    public int getRandomUnusedPort() throws IOException {
-      ServerSocket socket = null;
-      try {
-        socket = new ServerSocket();
-        socket.bind(new InetSocketAddress("localhost", 0));
+  private static boolean isValidPort(int port) {
+    return port > 1023 && !ALREADY_ALLOCATED.contains(port);
+  }
+
+  static class PortAllocator {
+    private static final PortAllocator INSTANCE = new PortAllocator();
+
+    int getAvailable(InetAddress address) {
+      try (ServerSocket socket = new ServerSocket(0, 50, address)) {
         return socket.getLocalPort();
       } catch (IOException e) {
-        throw new IllegalStateException("Can not find a free network port", e);
-      } finally {
-        IOUtils.closeQuietly(socket);
+        throw new IllegalStateException("Fail to find an available port on " + address, e);
       }
-    }
-
-    public static boolean isValidPort(int port) {
-      return port > 1023 && !ArrayUtils.contains(BLOCKED_PORTS, port);
     }
   }
 }
