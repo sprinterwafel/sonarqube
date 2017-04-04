@@ -23,11 +23,20 @@ import { isNil, omitBy } from 'lodash';
 type RawQuery = { [string]: string };
 
 export type Query = {|
+  assigned: boolean,
+  assignees: Array<string>,
+  authors: Array<string>,
+  directories: Array<string>,
+  files: Array<string>,
+  languages: Array<string>,
+  modules: Array<string>,
+  projects: Array<string>,
   resolved: boolean,
   resolutions: Array<string>,
   rules: Array<string>,
   severities: Array<string>,
   statuses: Array<string>,
+  tags: Array<string>,
   types: Array<string>
 |};
 
@@ -37,11 +46,20 @@ const parseAsBoolean = (value: ?string, defaultValue: boolean = true): boolean =
 const parseAsStringArray = (value: ?string): Array<string> => value ? value.split(',') : [];
 
 export const parseQuery = (query: RawQuery): Query => ({
-  severities: parseAsStringArray(query.severities),
-  statuses: parseAsStringArray(query.statuses),
+  assigned: parseAsBoolean(query.assigned),
+  assignees: parseAsStringArray(query.assignees),
+  authors: parseAsStringArray(query.authors),
+  directories: parseAsStringArray(query.directories),
+  files: parseAsStringArray(query.fileUuids),
+  languages: parseAsStringArray(query.languages),
+  modules: parseAsStringArray(query.moduleUuids),
+  projects: parseAsStringArray(query.projectUuids),
   resolved: parseAsBoolean(query.resolved),
   resolutions: parseAsStringArray(query.resolutions),
   rules: parseAsStringArray(query.rules),
+  severities: parseAsStringArray(query.severities),
+  statuses: parseAsStringArray(query.statuses),
+  tags: parseAsStringArray(query.tags),
   types: parseAsStringArray(query.types)
 });
 
@@ -51,11 +69,20 @@ const serializeValue = (value: Array<string>): ?string => value.length ? value.j
 
 export const serializeQuery = (query: Query): { [string]: string } => {
   const filter = {
-    severities: serializeValue(query.severities),
-    statuses: serializeValue(query.statuses),
+    assigned: query.assigned ? undefined : 'false',
+    assignees: serializeValue(query.assignees),
+    authors: serializeValue(query.authors),
+    directories: serializeValue(query.directories),
+    fileUuids: serializeValue(query.files),
+    languages: serializeValue(query.languages),
+    moduleUuids: serializeValue(query.modules),
+    projectUuids: serializeValue(query.projects),
     resolved: query.resolved ? undefined : 'false',
     resolutions: serializeValue(query.resolutions),
+    severities: serializeValue(query.severities),
+    statuses: serializeValue(query.statuses),
     rules: serializeValue(query.rules),
+    tags: serializeValue(query.tags),
     types: serializeValue(query.types)
   };
   return omitBy(filter, isNil);
@@ -100,13 +127,37 @@ type RawFacet = {
 export type Facet = { [string]: number };
 
 export const parseFacets = (facets: Array<RawFacet>): { [string]: Facet } => {
+  // for readability purpose
+  const propertyMapping = {
+    fileUuids: 'files',
+    moduleUuids: 'modules',
+    projectUuids: 'projects'
+  };
+
   const result = {};
   facets.forEach(facet => {
     const values = {};
     facet.values.forEach(value => {
       values[value.val] = value.count;
     });
-    result[facet.property] = values;
+    const finalProperty = propertyMapping[facet.property] || facet.property;
+    result[finalProperty] = values;
   });
   return result;
+};
+
+export type ReferencedComponent = {
+  key: string,
+  name: string,
+  organization: string,
+  path: string
+};
+
+export type ReferencedUser = {
+  avatar: string,
+  name: string
+};
+
+export type ReferencedLanguage = {
+  name: string
 };

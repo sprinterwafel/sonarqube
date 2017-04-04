@@ -19,12 +19,26 @@
  */
 // @flow
 import React from 'react';
-import TypeFacet from './TypeFacet';
+import AssigneeFacet from './AssigneeFacet';
+import AuthorFacet from './AuthorFacet';
+import DirectoryFacet from './DirectoryFacet';
+import FileFacet from './FileFacet';
+import LanguageFacet from './LanguageFacet';
+import ModuleFacet from './ModuleFacet';
+import ProjectFacet from './ProjectFacet';
 import ResolutionFacet from './ResolutionFacet';
 import RuleFacet from './RuleFacet';
 import SeverityFacet from './SeverityFacet';
 import StatusFacet from './StatusFacet';
-import type { Query, Facet } from '../utils';
+import TagFacet from './TagFacet';
+import TypeFacet from './TypeFacet';
+import type {
+  Query,
+  Facet,
+  ReferencedComponent,
+  ReferencedUser,
+  ReferencedLanguage
+} from '../utils';
 
 type Props = {|
   facets: { [string]: Facet },
@@ -32,7 +46,10 @@ type Props = {|
   onFilterChange: (changes: { [string]: Array<string> }) => void,
   openFacets: { [string]: boolean },
   query: Query,
-  referencedRules: { [string]: { name: string } }
+  referencedComponents: { [string]: ReferencedComponent },
+  referencedLanguages: { [string]: ReferencedLanguage },
+  referencedRules: { [string]: { name: string } },
+  referencedUsers: { [string]: ReferencedUser }
 |};
 
 export default class Sidebar extends React.PureComponent {
@@ -81,6 +98,69 @@ export default class Sidebar extends React.PureComponent {
               stats={facets.rules}
               referencedRules={this.props.referencedRules}
               rules={query.rules}
+            />
+            <TagFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.tags}
+              stats={facets.tags}
+              tags={query.tags}
+            />
+            <ProjectFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.projects}
+              projects={query.projects}
+              referencedComponents={this.props.referencedComponents}
+              stats={facets.projects}
+            />
+            <ModuleFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.modules}
+              modules={query.modules}
+              referencedComponents={this.props.referencedComponents}
+              stats={facets.modules}
+            />
+            <DirectoryFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.directories}
+              directories={query.directories}
+              referencedComponents={this.props.referencedComponents}
+              stats={facets.directories}
+            />
+            <FileFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.files}
+              files={query.files}
+              referencedComponents={this.props.referencedComponents}
+              stats={facets.files}
+            />
+            <AssigneeFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.assignees}
+              assigned={query.assigned}
+              assignees={query.assignees}
+              referencedUsers={this.props.referencedUsers}
+              stats={facets.assignees}
+            />
+            <AuthorFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.authors}
+              authors={query.authors}
+              stats={facets.authors}
+            />
+            <LanguageFacet
+              onChange={this.props.onFilterChange}
+              onToggle={this.props.onFacetToggle}
+              open={!!openFacets.languages}
+              languages={query.languages}
+              referencedLanguages={this.props.referencedLanguages}
+              stats={facets.languages}
             />
           </div>
         </div>

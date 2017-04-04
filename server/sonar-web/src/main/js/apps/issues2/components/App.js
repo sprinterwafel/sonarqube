@@ -24,7 +24,13 @@ import { keyBy } from 'lodash';
 import Sidebar from '../sidebar/Sidebar';
 import IssuesListContainer from './IssuesListContainer';
 import { parseQuery, areQueriesEqual, getOpen, serializeQuery, parseFacets } from '../utils';
-import type { Query, Facet } from '../utils';
+import type {
+  Query,
+  Facet,
+  ReferencedComponent,
+  ReferencedUser,
+  ReferencedLanguage
+} from '../utils';
 import IssuesSourceViewerContainer from './IssuesSourceViewerContainer';
 import ListFooter from '../../../components/controls/ListFooter';
 import { translate } from '../../../helpers/l10n';
@@ -47,7 +53,10 @@ type State = {
     total: number
   },
   query?: Query,
+  referencedComponents: { [string]: ReferencedComponent },
+  referencedLanguages: { [string]: ReferencedLanguage },
   referencedRules: { [string]: { name: string } },
+  referencedUsers: { [string]: ReferencedUser },
   selected?: string
 };
 
@@ -63,7 +72,10 @@ export default class App extends React.PureComponent {
       loading: true,
       openFacets: { resolutions: true, types: true },
       query: parseQuery(props.location.query),
+      referencedComponents: {},
+      referencedLanguages: {},
       referencedRules: {},
+      referencedUsers: {},
       selected: getOpen(props.location.query)
     };
   }
@@ -112,7 +124,21 @@ export default class App extends React.PureComponent {
     const parameters = {
       ...serializeQuery(query),
       ps: 25,
-      facets: ['types', 'resolutions', 'severities', 'statuses', 'rules'].join(),
+      facets: [
+        'assignees',
+        'authors',
+        'directories',
+        'fileUuids',
+        'languages',
+        'moduleUuids',
+        'projectUuids',
+        'resolutions',
+        'rules',
+        'severities',
+        'statuses',
+        'tags',
+        'types'
+      ].join(),
       ...additional
     };
 
@@ -130,7 +156,10 @@ export default class App extends React.PureComponent {
           loading: false,
           issues,
           paging: response.paging,
+          referencedComponents: keyBy(response.components, 'uuid'),
+          referencedLanguages: keyBy(response.languages, 'key'),
           referencedRules: keyBy(response.rules, 'key'),
+          referencedUsers: keyBy(response.users, 'login'),
           selected: issues.length > 0 ? issues[0] : undefined
         });
       }
@@ -199,7 +228,10 @@ export default class App extends React.PureComponent {
             onFilterChange={this.handleFilterChange}
             openFacets={this.state.openFacets}
             query={query}
+            referencedComponents={this.state.referencedComponents}
+            referencedLanguages={this.state.referencedLanguages}
             referencedRules={this.state.referencedRules}
+            referencedUsers={this.state.referencedUsers}
           />
 
           <div className="page-main">
