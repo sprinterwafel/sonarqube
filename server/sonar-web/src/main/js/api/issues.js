@@ -83,6 +83,11 @@ export function getIssuesCount(query: {}): Promise<*> {
 
 export const searchIssueTags = (ps: number = 500) => getJSON('/api/issues/tags', { ps });
 
+export function getIssueChangelog(issue: string): Promise<*> {
+  const url = '/api/issues/changelog';
+  return getJSON(url, { issue }).then(r => r.changelog);
+}
+
 export function getIssueFilters() {
   const url = '/api/issue_filters/search';
   return getJSON(url).then(r => r.issueFilters);
