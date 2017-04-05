@@ -33,12 +33,24 @@ type Props = {
   selected: boolean
 };
 
+type State = {
+  currentPopup: string
+};
+
 export default class BaseIssue extends React.PureComponent {
   props: Props;
+  state: State;
 
   static defaultProps = {
     selected: false
   };
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      currentPopup: ''
+    };
+  }
 
   componentDidMount() {
     //this.renderIssueView();
@@ -60,10 +72,10 @@ export default class BaseIssue extends React.PureComponent {
       this.bindShortcuts();
     }
 
-    const { resolution } = this.props.issue;
+    /*const { resolution } = this.props.issue;
     if (!prevProps.issue.resolution && ['FALSE-POSITIVE', 'WONTFIX'].includes(resolution)) {
       this.issueView.comment({ fromTransition: true });
-    }
+    }*/
   }
 
   componentWillUnmount() {
@@ -81,9 +93,20 @@ export default class BaseIssue extends React.PureComponent {
     document.removeEventListener('keypress', this.handleKeyPress);
   }
 
-  doIssueAction(action: string) {
-    this.issueView.$('.js-issue-' + action).click();
-  }
+  togglePopup = (popupName: string, open?: boolean) => {
+    if (open) {
+      this.setState({ currentPopup: popupName });
+    } else {
+      this.setState((prevState: State) => {
+        if (prevState.currentPopup === popupName) {
+          return { currentPopup: '' };
+        } else if (open == null) {
+          return { currentPopup: popupName };
+        }
+        return prevState;
+      });
+    }
+  };
 
   handleKeyPress = (e: Object) => {
     const tagName = e.target.tagName.toUpperCase();
@@ -92,19 +115,19 @@ export default class BaseIssue extends React.PureComponent {
     if (shouldHandle) {
       switch (e.key) {
         case 'f':
-          return this.doIssueAction('transition');
+          return this.togglePopup('transition');
         case 'a':
-          return this.doIssueAction('assign');
-        case 'm':
-          return this.doIssueAction('assign-to-me');
+          return this.togglePopup('assign');
+        /*case 'm':
+          return this.doIssueAction('assign-to-me');*/
         case 'p':
-          return this.doIssueAction('plan');
+          return this.togglePopup('plan');
         case 'i':
-          return this.doIssueAction('set-severity');
+          return this.togglePopup('set-severity');
         case 'c':
-          return this.doIssueAction('comment');
+          return this.togglePopup('comment');
         case 't':
-          return this.doIssueAction('edit-tags');
+          return this.togglePopup('edit-tags');
       }
     }
   };
@@ -131,17 +154,18 @@ export default class BaseIssue extends React.PureComponent {
 
   render() {
     return (
-      <div className="issue-container">
-        <IssueView
-          issue={this.props.issue}
-          checked={this.props.checked}
-          onCheck={this.props.onCheck}
-          onClick={this.props.onClick}
-          onFail={this.props.onFail}
-          onFilterClick={this.props.onFilterClick}
-          onIssueChange={this.props.onIssueChange}
-        />
-      </div>
+      <IssueView
+        issue={this.props.issue}
+        checked={this.props.checked}
+        onCheck={this.props.onCheck}
+        onClick={this.props.onClick}
+        onFail={this.props.onFail}
+        onFilterClick={this.props.onFilterClick}
+        onIssueChange={this.props.onIssueChange}
+        togglePopup={this.togglePopup}
+        currentPopup={this.state.currentPopup}
+        selected={this.props.selected}
+      />
     );
   }
 }

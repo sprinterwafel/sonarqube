@@ -19,7 +19,6 @@
  */
 // @flow
 import React from 'react';
-import Workspace from '../../workspace/main';
 import { translate } from '../../../helpers/l10n';
 
 export default class IssueMessage extends React.PureComponent {
@@ -32,6 +31,7 @@ export default class IssueMessage extends React.PureComponent {
   onClick = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const Workspace = require('../../workspace/main').default;
     Workspace.openRule({
       key: this.props.rule,
       organization: this.props.organization

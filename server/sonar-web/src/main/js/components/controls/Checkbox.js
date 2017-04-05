@@ -30,8 +30,7 @@ export default class Checkbox extends React.Component {
   };
 
   static defaultProps = {
-    thirdState: false,
-    className: ''
+    thirdState: false
   };
 
   componentWillMount() {

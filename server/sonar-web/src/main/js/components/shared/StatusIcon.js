@@ -20,7 +20,7 @@
 //@flow
 import React from 'react';
 
-export default function(props: { status: string }) {
+export default function StatusIcon(props: { status: string }) {
   const className = 'icon-status-' + props.status.toLowerCase();
   return <i className={className} />;
 }

@@ -6,7 +6,6 @@ exports[`test should be able to toggle check 1`] = `
   tabIndex={0}>
   <Checkbox
     checked={true}
-    className=""
     onCheck={[Function]}
     thirdState={false} />
    
@@ -31,7 +30,6 @@ exports[`test should be able to toggle check 3`] = `
   tabIndex={0}>
   <Checkbox
     checked={false}
-    className=""
     onCheck={[Function]}
     thirdState={false} />
    
@@ -47,7 +45,6 @@ exports[`test should render unchecked 1`] = `
   tabIndex={0}>
   <Checkbox
     checked={false}
-    className=""
     onCheck={[Function]}
     thirdState={false} />
    
