@@ -19,7 +19,7 @@
  */
 // @flow
 import React from 'react';
-import { orderBy, uniq, without } from 'lodash';
+import { orderBy, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
@@ -54,7 +54,7 @@ export default class ResolutionFacet extends React.PureComponent {
       const newValue = orderBy(
         resolutions.includes(itemValue)
           ? without(resolutions, itemValue)
-          : uniq([...resolutions, itemValue])
+          : [...resolutions, itemValue]
       );
       this.props.onChange({ resolved: true, resolutions: newValue });
     }

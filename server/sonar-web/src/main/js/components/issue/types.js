@@ -51,6 +51,7 @@ export type Issue = {
   assigneeLogin?: string,
   assigneeName?: string,
   comments?: Array<IssueComment>,
+  component: string,
   creationDate: string,
   effort?: string,
   key: string,

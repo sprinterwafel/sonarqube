@@ -19,7 +19,7 @@
  */
 // @flow
 import React from 'react';
-import { sortBy, uniq, without } from 'lodash';
+import { sortBy, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
@@ -50,7 +50,7 @@ export default class DirectoryFacet extends React.PureComponent {
     const newValue = sortBy(
       directories.includes(itemValue)
         ? without(directories, itemValue)
-        : uniq([...directories, itemValue])
+        : [...directories, itemValue]
     );
     this.props.onChange({ [this.property]: newValue });
   };

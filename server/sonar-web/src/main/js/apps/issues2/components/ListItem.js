@@ -21,9 +21,10 @@
 import React from 'react';
 import ListItemComponent from './ListItemComponent';
 import Issue from '../../../components/issue/Issue';
+import type { Issue as IssueType } from '../../../components/issue/types';
 
 type Props = {
-  issue: Object,
+  issue: IssueType,
   previousIssue: ?Object
 };
 

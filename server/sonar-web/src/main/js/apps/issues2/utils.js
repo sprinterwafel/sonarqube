@@ -67,7 +67,7 @@ export const getOpen = (query: RawQuery) => query.open;
 
 const serializeValue = (value: Array<string>): ?string => value.length ? value.join() : undefined;
 
-export const serializeQuery = (query: Query): { [string]: string } => {
+export const serializeQuery = (query: Query): RawQuery => {
   const filter = {
     assigned: query.assigned ? undefined : 'false',
     assignees: serializeValue(query.assignees),

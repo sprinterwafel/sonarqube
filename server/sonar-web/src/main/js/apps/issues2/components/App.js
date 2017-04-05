@@ -259,7 +259,6 @@ export default class App extends React.PureComponent {
                 <div className={openIssue != null ? 'hidden' : undefined}>
                   <IssuesListContainer
                     issues={issues}
-                    loadMore={this.fetchMoreIssues}
                     onIssueClick={this.handleIssueClick}
                     selected={selected}
                   />

@@ -19,7 +19,7 @@
  */
 // @flow
 import React from 'react';
-import { sortBy, uniq, without } from 'lodash';
+import { sortBy, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
@@ -55,9 +55,7 @@ export default class AssigneeFacet extends React.PureComponent {
       // defined assignee
       const { assignees } = this.props;
       const newValue = sortBy(
-        assignees.includes(itemValue)
-          ? without(assignees, itemValue)
-          : uniq([...assignees, itemValue])
+        assignees.includes(itemValue) ? without(assignees, itemValue) : [...assignees, itemValue]
       );
       this.props.onChange({ assigned: true, assignees: newValue });
     }

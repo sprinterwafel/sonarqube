@@ -27,9 +27,6 @@ type Props = {
   selected: ?string
 };
 
-// onClick={this.handleIssueClick}
-// selected={selected === issue}
-
 export default class IssuesList extends React.PureComponent {
   props: Props;
 

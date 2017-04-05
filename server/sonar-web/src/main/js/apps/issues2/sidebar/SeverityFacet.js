@@ -19,7 +19,7 @@
  */
 // @flow
 import React from 'react';
-import { orderBy, uniq, without } from 'lodash';
+import { orderBy, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
@@ -47,9 +47,7 @@ export default class SeverityFacet extends React.PureComponent {
   handleItemClick = (itemValue: string) => {
     const { severities } = this.props;
     const newValue = orderBy(
-      severities.includes(itemValue)
-        ? without(severities, itemValue)
-        : uniq([...severities, itemValue])
+      severities.includes(itemValue) ? without(severities, itemValue) : [...severities, itemValue]
     );
     this.props.onChange({ [this.property]: newValue });
   };

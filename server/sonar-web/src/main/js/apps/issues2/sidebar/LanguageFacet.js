@@ -19,7 +19,7 @@
  */
 // @flow
 import React from 'react';
-import { sortBy, uniq, without } from 'lodash';
+import { sortBy, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
@@ -48,9 +48,7 @@ export default class LanguageFacet extends React.PureComponent {
   handleItemClick = (itemValue: string) => {
     const { languages } = this.props;
     const newValue = sortBy(
-      languages.includes(itemValue)
-        ? without(languages, itemValue)
-        : uniq([...languages, itemValue])
+      languages.includes(itemValue) ? without(languages, itemValue) : [...languages, itemValue]
     );
     this.props.onChange({ [this.property]: newValue });
   };

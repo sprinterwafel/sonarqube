@@ -28,41 +28,47 @@ type Props = {
   open: boolean
 };
 
-const FacetHeader = (props: Props) => {
-  const handleClick = (e: Event & { currentTarget: HTMLElement }) => {
+export default class FacetHeader extends React.PureComponent {
+  props: Props;
+
+  handleClick = (e: Event & { currentTarget: HTMLElement }) => {
     e.preventDefault();
     e.currentTarget.blur();
-    props.onClick();
+    this.props.onClick();
   };
 
-  const checkbox = (
-    <svg viewBox="0 0 1792 1792" width="10" height="10" style={{ paddingTop: 3 }}>
-      {props.open
-        ? <path
-            style={{ fill: 'currentColor ' }}
-            d="M1683 808l-742 741q-19 19-45 19t-45-19l-742-741q-19-19-19-45.5t19-45.5l166-165q19-19 45-19t45 19l531 531 531-531q19-19 45-19t45 19l166 165q19 19 19 45.5t-19 45.5z"
-          />
-        : <path
-            style={{ fill: 'currentColor ' }}
-            d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"
-          />}
-    </svg>
-  );
-
-  const valueIndicator = props.hasValue && !props.open
-    ? <svg viewBox="0 0 1792 1792" width="8" height="8" style={{ paddingTop: 5, paddingLeft: 8 }}>
-        <path
-          d="M1664 896q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z"
-          fill="#4b9fd5"
-        />
+  renderCheckbox() {
+    return (
+      <svg viewBox="0 0 1792 1792" width="10" height="10" style={{ paddingTop: 3 }}>
+        {this.props.open
+          ? <path
+              style={{ fill: 'currentColor ' }}
+              d="M1683 808l-742 741q-19 19-45 19t-45-19l-742-741q-19-19-19-45.5t19-45.5l166-165q19-19 45-19t45 19l531 531 531-531q19-19 45-19t45 19l166 165q19 19 19 45.5t-19 45.5z"
+            />
+          : <path
+              style={{ fill: 'currentColor ' }}
+              d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"
+            />}
       </svg>
-    : null;
+    );
+  }
 
-  return (
-    <a className="search-navigator-facet-header" href="#" onClick={handleClick}>
-      {checkbox}{' '}{props.name}{' '}{valueIndicator}
-    </a>
-  );
-};
+  renderValueIndicator() {
+    return this.props.hasValue && !this.props.open
+      ? <svg viewBox="0 0 1792 1792" width="8" height="8" style={{ paddingTop: 5, paddingLeft: 8 }}>
+          <path
+            d="M1664 896q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z"
+            fill="#4b9fd5"
+          />
+        </svg>
+      : null;
+  }
 
-export default FacetHeader;
+  render() {
+    return (
+      <a className="search-navigator-facet-header" href="#" onClick={this.handleClick}>
+        {this.renderCheckbox()}{' '}{this.props.name}{' '}{this.renderValueIndicator()}
+      </a>
+    );
+  }
+}
