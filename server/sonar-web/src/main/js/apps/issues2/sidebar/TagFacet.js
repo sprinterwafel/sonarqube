@@ -60,6 +60,15 @@ export default class TagFacet extends React.PureComponent {
     return stats ? stats[tag] : null;
   }
 
+  renderTag(tag: string) {
+    return (
+      <span>
+        <i className="icon-tags icon-gray little-spacer-right" />
+        {tag}
+      </span>
+    );
+  }
+
   render() {
     const { stats } = this.props;
 
@@ -83,7 +92,7 @@ export default class TagFacet extends React.PureComponent {
             <FacetItem
               active={this.props.tags.includes(tag)}
               key={tag}
-              name={tag}
+              name={this.renderTag(tag)}
               onClick={this.handleItemClick}
               stat={this.getStat(tag)}
               value={tag}

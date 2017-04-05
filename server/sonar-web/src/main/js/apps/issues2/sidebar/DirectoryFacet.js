@@ -25,6 +25,7 @@ import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
 import type { ReferencedComponent } from '../utils';
+import QualifierIcon from '../../../components/shared/QualifierIcon';
 import { translate } from '../../../helpers/l10n';
 
 type Props = {|
@@ -71,7 +72,13 @@ export default class DirectoryFacet extends React.PureComponent {
     const uuid = Object.keys(referencedComponents).find(
       uuid => referencedComponents[uuid].key === directory
     );
-    return uuid ? referencedComponents[uuid].name : directory;
+    const name = uuid ? referencedComponents[uuid].name : directory;
+    return (
+      <span>
+        <QualifierIcon className="little-spacer-right" qualifier="DIR" />
+        {name}
+      </span>
+    );
   }
 
   render() {

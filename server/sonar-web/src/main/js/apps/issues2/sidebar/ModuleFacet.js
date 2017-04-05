@@ -25,6 +25,7 @@ import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
 import type { ReferencedComponent } from '../utils';
+import QualifierIcon from '../../../components/shared/QualifierIcon';
 import { translate } from '../../../helpers/l10n';
 
 type Props = {|
@@ -64,7 +65,13 @@ export default class ModuleFacet extends React.PureComponent {
 
   renderName(module: string): React.Element<*> | string {
     const { referencedComponents } = this.props;
-    return referencedComponents[module] ? referencedComponents[module].name : module;
+    const name = referencedComponents[module] ? referencedComponents[module].name : module;
+    return (
+      <span>
+        <QualifierIcon className="little-spacer-right" qualifier="BRC" />
+        {name}
+      </span>
+    );
   }
 
   render() {

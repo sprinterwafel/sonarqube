@@ -25,6 +25,7 @@ import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
 import type { ReferencedComponent } from '../utils';
+import QualifierIcon from '../../../components/shared/QualifierIcon';
 import { translate } from '../../../helpers/l10n';
 import { collapsePath } from '../../../helpers/path';
 
@@ -65,7 +66,15 @@ export default class FileFacet extends React.PureComponent {
 
   renderName(file: string): React.Element<*> | string {
     const { referencedComponents } = this.props;
-    return referencedComponents[file] ? collapsePath(referencedComponents[file].path, 15) : file;
+    const name = referencedComponents[file]
+      ? collapsePath(referencedComponents[file].path, 15)
+      : file;
+    return (
+      <span>
+        <QualifierIcon className="little-spacer-right" qualifier="FIL" />
+        {name}
+      </span>
+    );
   }
 
   render() {

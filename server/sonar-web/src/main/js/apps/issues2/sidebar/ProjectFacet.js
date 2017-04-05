@@ -26,6 +26,7 @@ import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
 import type { ReferencedComponent } from '../utils';
 import Organization from '../../../components/shared/Organization';
+import QualifierIcon from '../../../components/shared/QualifierIcon';
 import { translate } from '../../../helpers/l10n';
 
 type Props = {|
@@ -67,10 +68,14 @@ export default class ProjectFacet extends React.PureComponent {
     const { referencedComponents } = this.props;
     return referencedComponents[project]
       ? <span>
+          <QualifierIcon className="little-spacer-right" qualifier="TRK" />
           <Organization link={false} organizationKey={referencedComponents[project].organization} />
           {referencedComponents[project].name}
         </span>
-      : project;
+      : <span>
+          <QualifierIcon className="little-spacer-right" qualifier="TRK" />
+          {project}
+        </span>;
   }
 
   render() {
