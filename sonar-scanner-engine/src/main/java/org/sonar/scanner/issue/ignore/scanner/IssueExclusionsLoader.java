@@ -19,55 +19,81 @@
  */
 package org.sonar.scanner.issue.ignore.scanner;
 
-import org.sonar.api.batch.fs.FileSystem;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.internal.DefaultInputFile;
+import org.sonar.api.batch.fs.internal.FileMetadata.CharHandler;
+import org.sonar.scanner.issue.ignore.pattern.BlockIssuePattern;
 import org.sonar.scanner.issue.ignore.pattern.IssueExclusionPatternInitializer;
-import org.sonar.scanner.issue.ignore.pattern.IssueInclusionPatternInitializer;
+import org.sonar.scanner.issue.ignore.pattern.IssuePattern;
+import org.sonar.scanner.issue.ignore.pattern.PatternMatcher;
 
 public final class IssueExclusionsLoader {
+  private final List<java.util.regex.Pattern> allFilePatterns;
+  private final List<DoubleRegexpMatcher> blockMatchers;
 
-  private final IssueExclusionsRegexpScanner regexpScanner;
-  private final IssueExclusionPatternInitializer exclusionPatternInitializer;
-  private final IssueInclusionPatternInitializer inclusionPatternInitializer;
-  private final FileSystem fileSystem;
+  private final PatternMatcher patternMatcher;
+  private final IssueExclusionPatternInitializer patternsInitializer;
 
-  public IssueExclusionsLoader(IssueExclusionsRegexpScanner regexpScanner, IssueExclusionPatternInitializer exclusionPatternInitializer,
-    IssueInclusionPatternInitializer inclusionPatternInitializer, FileSystem fileSystem) {
-    this.regexpScanner = regexpScanner;
-    this.exclusionPatternInitializer = exclusionPatternInitializer;
-    this.inclusionPatternInitializer = inclusionPatternInitializer;
-    this.fileSystem = fileSystem;
-  }
+  public IssueExclusionsLoader(IssueExclusionPatternInitializer patternsInitializer, PatternMatcher patternMatcher) {
+    this.patternsInitializer = patternsInitializer;
+    this.patternMatcher = patternMatcher;
+    this.allFilePatterns = new ArrayList<>();
+    this.blockMatchers = new ArrayList<>();
 
-  public boolean shouldExecute() {
-    return inclusionPatternInitializer.hasConfiguredPatterns()
-      || exclusionPatternInitializer.hasConfiguredPatterns();
-  }
-
-  public void preLoadAllFiles() {
-    for (InputFile inputFile : fileSystem.inputFiles(fileSystem.predicates().all())) {
-      loadFile(inputFile);
+    for (String pattern : patternsInitializer.getAllFilePatterns()) {
+      allFilePatterns.add(java.util.regex.Pattern.compile(pattern));
+    }
+    for (BlockIssuePattern pattern : patternsInitializer.getBlockPatterns()) {
+      blockMatchers.add(new DoubleRegexpMatcher(
+        java.util.regex.Pattern.compile(pattern.getBeginBlockRegexp()),
+        java.util.regex.Pattern.compile(pattern.getEndBlockRegexp())));
     }
   }
 
-  public boolean isLoaded(InputFile inputFile) {
-    String componentEffectiveKey = ((DefaultInputFile) inputFile).key();
-    return inclusionPatternInitializer.getPathForComponent(componentEffectiveKey) != null;
+  public boolean shouldExecute() {
+    return patternsInitializer.hasMulticriteriaPatterns();
   }
 
-  public void loadFile(InputFile inputFile) {
-    try {
-      String componentEffectiveKey = ((DefaultInputFile) inputFile).key();
-      String path = inputFile.relativePath();
-      inclusionPatternInitializer.initializePatternsForPath(path, componentEffectiveKey);
-      exclusionPatternInitializer.initializePatternsForPath(path, componentEffectiveKey);
-      if (exclusionPatternInitializer.hasFileContentPattern()) {
-        regexpScanner.scan(componentEffectiveKey, inputFile.path(), inputFile.charset());
+  public void addMulticriteriaPatterns(String relativePath, String componentKey) {
+    for (IssuePattern pattern : patternsInitializer.getMulticriteriaPatterns()) {
+      if (pattern.matchResource(relativePath)) {
+        patternMatcher.addPatternForComponent(componentKey, pattern);
       }
-    } catch (Exception e) {
-      throw new IllegalStateException("Unable to read the source file : '" + inputFile.absolutePath() + "' with the charset : '"
-        + inputFile.charset().name() + "'.", e);
+    }
+  }
+
+  public CharHandler createCharHandlerFor(InputFile inputFile) {
+    if (!allFilePatterns.isEmpty() || !blockMatchers.isEmpty()) {
+      return new IssueExclusionsRegexpScanner(inputFile.key(), allFilePatterns, blockMatchers, patternMatcher);
+    }
+    // no-op
+    return new CharHandler() {
+    };
+  }
+
+  public static class DoubleRegexpMatcher {
+
+    private java.util.regex.Pattern firstPattern;
+    private java.util.regex.Pattern secondPattern;
+
+    DoubleRegexpMatcher(java.util.regex.Pattern firstPattern, java.util.regex.Pattern secondPattern) {
+      this.firstPattern = firstPattern;
+      this.secondPattern = secondPattern;
+    }
+
+    boolean matchesFirstPattern(String line) {
+      return firstPattern.matcher(line).find();
+    }
+
+    boolean matchesSecondPattern(String line) {
+      return hasSecondPattern() && secondPattern.matcher(line).find();
+    }
+
+    boolean hasSecondPattern() {
+      return StringUtils.isNotEmpty(secondPattern.toString());
     }
   }
 
@@ -75,5 +101,4 @@ public final class IssueExclusionsLoader {
   public String toString() {
     return "Issues Exclusions - Source Scanner";
   }
-
 }

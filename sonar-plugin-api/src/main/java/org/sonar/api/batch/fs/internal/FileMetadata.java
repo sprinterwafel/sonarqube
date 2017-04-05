@@ -33,8 +33,13 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.ByteOrderMark;
@@ -175,7 +180,7 @@ public class FileMetadata {
       return Hex.encodeHexString(globalMd5Digest.digest());
     }
   }
-
+  
   private static class LineHashComputer extends CharHandler {
     private final MessageDigest lineMd5Digest = DigestUtils.getMd5Digest();
     private final CharsetEncoder encoder;
@@ -270,11 +275,16 @@ public class FileMetadata {
    * Compute hash of a file ignoring line ends differences.
    * Maximum performance is needed.
    */
-  public Metadata readMetadata(File file, Charset encoding) {
+  public Metadata readMetadata(File file, Charset encoding, CharHandler... otherHandlers) {
     LineCounter lineCounter = new LineCounter(file, encoding);
     FileHashComputer fileHashComputer = new FileHashComputer(file);
     LineOffsetCounter lineOffsetCounter = new LineOffsetCounter();
-    readFile(file, encoding, lineCounter, fileHashComputer, lineOffsetCounter);
+    List<CharHandler> handlers = new ArrayList<>(Arrays.asList(otherHandlers));
+    handlers.add(lineCounter);
+    handlers.add(fileHashComputer);
+    handlers.add(lineOffsetCounter);
+
+    readFile(file, encoding, handlers.toArray(new CharHandler[handlers.size()]));
     return new Metadata(lineCounter.lines(), lineCounter.nonBlankLines(), fileHashComputer.getHash(), lineOffsetCounter.getOriginalLineOffsets(),
       lineOffsetCounter.getLastValidOffset());
   }
@@ -289,7 +299,7 @@ public class FileMetadata {
     try {
       read(reader, lineCounter, fileHashComputer, lineOffsetCounter);
     } catch (IOException e) {
-      throw new IllegalStateException("Should never occurs", e);
+      throw new IllegalStateException("Should never occur", e);
     }
     return new Metadata(lineCounter.lines(), lineCounter.nonBlankLines(), fileHashComputer.getHash(), lineOffsetCounter.getOriginalLineOffsets(),
       lineOffsetCounter.getLastValidOffset());
@@ -354,9 +364,7 @@ public class FileMetadata {
 
   @FunctionalInterface
   public interface LineHashConsumer {
-
     void consume(int lineIdx, @Nullable byte[] hash);
-
   }
 
   /**
