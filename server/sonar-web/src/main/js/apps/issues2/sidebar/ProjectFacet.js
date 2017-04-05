@@ -19,14 +19,16 @@
  */
 // @flow
 import React from 'react';
-import { sortBy, without } from 'lodash';
+import { sortBy, uniq, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
+import FacetFooter from './components/FacetFooter';
 import type { ReferencedComponent } from '../utils';
 import Organization from '../../../components/shared/Organization';
 import QualifierIcon from '../../../components/shared/QualifierIcon';
+import { searchComponents } from '../../../api/components';
 import { translate } from '../../../helpers/l10n';
 
 type Props = {|
@@ -59,6 +61,20 @@ export default class ProjectFacet extends React.PureComponent {
     this.props.onToggle(this.property);
   };
 
+  handleSearch = (query: string) => {
+    return searchComponents({ ps: 50, q: query, qualifiers: 'TRK' }).then(response =>
+      response.components.map(component => ({
+        label: component.name,
+        organization: component.organization,
+        value: component.id
+      })));
+  };
+
+  handleSelect = (rule: string) => {
+    const { projects } = this.props;
+    this.props.onChange({ [this.property]: uniq([...projects, rule]) });
+  };
+
   getStat(project: string): ?number {
     const { stats } = this.props;
     return stats ? stats[project] : null;
@@ -78,6 +94,15 @@ export default class ProjectFacet extends React.PureComponent {
         </span>;
   }
 
+  renderOption = (option: { label: string, organization: string }) => {
+    return (
+      <span>
+        <Organization link={false} organizationKey={option.organization} />
+        {option.label}
+      </span>
+    );
+  };
+
   render() {
     const { stats } = this.props;
 
@@ -96,18 +121,26 @@ export default class ProjectFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {projects.map(project => (
-            <FacetItem
-              active={this.props.projects.includes(project)}
-              key={project}
-              name={this.renderName(project)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(project)}
-              value={project}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {projects.map(project => (
+              <FacetItem
+                active={this.props.projects.includes(project)}
+                key={project}
+                name={this.renderName(project)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(project)}
+                value={project}
+              />
+            ))}
+          </FacetItemsList>}
+
+        {this.props.open &&
+          <FacetFooter
+            onSearch={this.handleSearch}
+            onSelect={this.handleSelect}
+            renderOption={this.renderOption}
+          />}
       </FacetBox>
     );
   }

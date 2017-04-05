@@ -19,14 +19,17 @@
  */
 // @flow
 import React from 'react';
-import { sortBy, without } from 'lodash';
+import { sortBy, uniq, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
+import FacetFooter from './components/FacetFooter';
+import { searchRules } from '../../../api/rules';
 import { translate } from '../../../helpers/l10n';
 
 type Props = {|
+  languages: Array<string>,
   onChange: (changes: { [string]: Array<string> }) => void,
   onToggle: (property: string) => void,
   open: boolean,
@@ -54,6 +57,21 @@ export default class RuleFacet extends React.PureComponent {
 
   handleHeaderClick = () => {
     this.props.onToggle(this.property);
+  };
+
+  handleSearch = (query: string) => {
+    const { languages } = this.props;
+    return searchRules({
+      f: 'name,langName',
+      languages: languages.length ? languages.join() : undefined,
+      q: query
+    }).then(response =>
+      response.rules.map(rule => ({ label: `(${rule.langName}) ${rule.name}`, value: rule.key })));
+  };
+
+  handleSelect = (rule: string) => {
+    const { rules } = this.props;
+    this.props.onChange({ [this.property]: uniq([...rules, rule]) });
   };
 
   getRuleName(rule: string): string {
@@ -84,18 +102,22 @@ export default class RuleFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {rules.map(rule => (
-            <FacetItem
-              active={this.props.rules.includes(rule)}
-              key={rule}
-              name={this.getRuleName(rule)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(rule)}
-              value={rule}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {rules.map(rule => (
+              <FacetItem
+                active={this.props.rules.includes(rule)}
+                key={rule}
+                name={this.getRuleName(rule)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(rule)}
+                value={rule}
+              />
+            ))}
+          </FacetItemsList>}
+
+        {this.props.open &&
+          <FacetFooter onSearch={this.handleSearch} onSelect={this.handleSelect} />}
       </FacetBox>
     );
   }

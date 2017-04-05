@@ -90,6 +90,7 @@ export default class Sidebar extends React.PureComponent {
           statuses={query.statuses}
         />
         <RuleFacet
+          languages={query.languages}
           onChange={this.props.onFilterChange}
           onToggle={this.props.onFacetToggle}
           open={!!openFacets.rules}

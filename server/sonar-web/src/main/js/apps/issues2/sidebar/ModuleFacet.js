@@ -92,18 +92,19 @@ export default class ModuleFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {modules.map(module => (
-            <FacetItem
-              active={this.props.modules.includes(module)}
-              key={module}
-              name={this.renderName(module)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(module)}
-              value={module}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {modules.map(module => (
+              <FacetItem
+                active={this.props.modules.includes(module)}
+                key={module}
+                name={this.renderName(module)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(module)}
+                value={module}
+              />
+            ))}
+          </FacetItemsList>}
       </FacetBox>
     );
   }

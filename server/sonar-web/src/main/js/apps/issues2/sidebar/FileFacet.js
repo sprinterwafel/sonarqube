@@ -95,18 +95,19 @@ export default class FileFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {files.map(file => (
-            <FacetItem
-              active={this.props.files.includes(file)}
-              key={file}
-              name={this.renderName(file)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(file)}
-              value={file}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {files.map(file => (
+              <FacetItem
+                active={this.props.files.includes(file)}
+                key={file}
+                name={this.renderName(file)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(file)}
+                value={file}
+              />
+            ))}
+          </FacetItemsList>}
       </FacetBox>
     );
   }

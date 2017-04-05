@@ -78,18 +78,19 @@ export default class AuthorFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {authors.map(author => (
-            <FacetItem
-              active={this.props.authors.includes(author)}
-              key={author}
-              name={author}
-              onClick={this.handleItemClick}
-              stat={this.getStat(author)}
-              value={author}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {authors.map(author => (
+              <FacetItem
+                active={this.props.authors.includes(author)}
+                key={author}
+                name={author}
+                onClick={this.handleItemClick}
+                stat={this.getStat(author)}
+                value={author}
+              />
+            ))}
+          </FacetItemsList>}
       </FacetBox>
     );
   }

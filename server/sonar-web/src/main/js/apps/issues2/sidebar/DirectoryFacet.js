@@ -99,18 +99,19 @@ export default class DirectoryFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {directories.map(directory => (
-            <FacetItem
-              active={this.props.directories.includes(directory)}
-              key={directory}
-              name={this.renderName(directory)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(directory)}
-              value={directory}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {directories.map(directory => (
+              <FacetItem
+                active={this.props.directories.includes(directory)}
+                key={directory}
+                name={this.renderName(directory)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(directory)}
+                value={directory}
+              />
+            ))}
+          </FacetItemsList>}
       </FacetBox>
     );
   }

@@ -82,19 +82,20 @@ export default class StatusFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {statuses.map(status => (
-            <FacetItem
-              active={this.props.statuses.includes(status)}
-              halfWidth={true}
-              key={status}
-              name={this.renderStatus(status)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(status)}
-              value={status}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {statuses.map(status => (
+              <FacetItem
+                active={this.props.statuses.includes(status)}
+                halfWidth={true}
+                key={status}
+                name={this.renderStatus(status)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(status)}
+                value={status}
+              />
+            ))}
+          </FacetItemsList>}
       </FacetBox>
     );
   }

@@ -19,11 +19,12 @@
  */
 // @flow
 import React from 'react';
-import { sortBy, without } from 'lodash';
+import { sortBy, uniq, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
+import LanguageFacetFooter from './LanguageFacetFooter';
 import type { ReferencedLanguage } from '../utils';
 import { translate } from '../../../helpers/l10n';
 
@@ -67,6 +68,11 @@ export default class LanguageFacet extends React.PureComponent {
     return stats ? stats[language] : null;
   }
 
+  handleSelect = (language: string) => {
+    const { languages } = this.props;
+    this.props.onChange({ [this.property]: uniq([...languages, language]) });
+  };
+
   render() {
     const { stats } = this.props;
 
@@ -85,18 +91,21 @@ export default class LanguageFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {languages.map(language => (
-            <FacetItem
-              active={this.props.languages.includes(language)}
-              key={language}
-              name={this.getLanguageName(language)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(language)}
-              value={language}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {languages.map(language => (
+              <FacetItem
+                active={this.props.languages.includes(language)}
+                key={language}
+                name={this.getLanguageName(language)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(language)}
+                value={language}
+              />
+            ))}
+          </FacetItemsList>}
+
+        {this.props.open && <LanguageFacetFooter onSelect={this.handleSelect} />}
       </FacetBox>
     );
   }

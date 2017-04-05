@@ -89,19 +89,20 @@ export default class ResolutionFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {resolutions.map(resolution => (
-            <FacetItem
-              active={this.isFacetItemActive(resolution)}
-              key={resolution}
-              halfWidth={true}
-              name={this.getFacetItemName(resolution)}
-              onClick={this.handleItemClick}
-              stat={this.getStat(resolution)}
-              value={resolution}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {resolutions.map(resolution => (
+              <FacetItem
+                active={this.isFacetItemActive(resolution)}
+                key={resolution}
+                halfWidth={true}
+                name={this.getFacetItemName(resolution)}
+                onClick={this.handleItemClick}
+                stat={this.getStat(resolution)}
+                value={resolution}
+              />
+            ))}
+          </FacetItemsList>}
       </FacetBox>
     );
   }

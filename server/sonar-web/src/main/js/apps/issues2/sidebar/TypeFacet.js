@@ -73,18 +73,19 @@ export default class TypeFacet extends React.PureComponent {
           open={this.props.open}
         />
 
-        <FacetItemsList open={this.props.open}>
-          {types.map(type => (
-            <FacetItem
-              active={this.props.types.includes(type)}
-              key={type}
-              name={<span><IssueTypeIcon query={type} /> {translate('issue.type', type)}</span>}
-              onClick={this.handleItemClick}
-              stat={this.getStat(type)}
-              value={type}
-            />
-          ))}
-        </FacetItemsList>
+        {this.props.open &&
+          <FacetItemsList>
+            {types.map(type => (
+              <FacetItem
+                active={this.props.types.includes(type)}
+                key={type}
+                name={<span><IssueTypeIcon query={type} /> {translate('issue.type', type)}</span>}
+                onClick={this.handleItemClick}
+                stat={this.getStat(type)}
+                value={type}
+              />
+            ))}
+          </FacetItemsList>}
       </FacetBox>
     );
   }

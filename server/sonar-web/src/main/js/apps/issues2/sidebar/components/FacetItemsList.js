@@ -19,15 +19,13 @@
  */
 // @flow
 import React from 'react';
-import classNames from 'classnames';
 
 type Props = {|
-  children?: Array<React.Element<*>>,
-  open: boolean
+  children?: Array<React.Element<*>>
 |};
 
 const FacetItemsList = (props: Props) => (
-  <div className={classNames('search-navigator-facet-list', { hidden: !props.open })}>
+  <div className="search-navigator-facet-list">
     {props.children}
   </div>
 );
