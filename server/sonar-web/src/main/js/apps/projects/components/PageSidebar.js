@@ -55,7 +55,7 @@ export default class PageSidebar extends React.PureComponent {
       : undefined;
 
     return (
-      <div className="search-navigator-facets-list">
+      <div>
         <FavoriteFilterContainer organization={this.props.organization} />
 
         <div className="projects-facets-header clearfix">

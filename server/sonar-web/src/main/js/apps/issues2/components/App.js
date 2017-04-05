@@ -33,6 +33,10 @@ import type {
 } from '../utils';
 import IssuesSourceViewerContainer from './IssuesSourceViewerContainer';
 import ListFooter from '../../../components/controls/ListFooter';
+import Page from '../../../components/layout/Page';
+import PageMain from '../../../components/layout/PageMain';
+import PageSide from '../../../components/layout/PageSide';
+import PageFilters from '../../../components/layout/PageFilters';
 import { translate } from '../../../helpers/l10n';
 import { formatMeasure } from '../../../helpers/measures';
 
@@ -218,62 +222,64 @@ export default class App extends React.PureComponent {
     const openIssue = issues != null && issues.includes(open) ? open : null;
 
     return (
-      <div id="issues-page" className="page page-limited">
+      <Page className="issues" id="issues-page">
         <Helmet title={translate('issues.page')} titleTemplate="%s - SonarQube" />
 
-        <div className="page-with-sidebar page-with-left-sidebar">
-          <Sidebar
-            facets={this.state.facets}
-            onFacetToggle={this.handleFacetToggle}
-            onFilterChange={this.handleFilterChange}
-            openFacets={this.state.openFacets}
-            query={query}
-            referencedComponents={this.state.referencedComponents}
-            referencedLanguages={this.state.referencedLanguages}
-            referencedRules={this.state.referencedRules}
-            referencedUsers={this.state.referencedUsers}
-          />
+        <PageSide>
+          <PageFilters>
+            <Sidebar
+              facets={this.state.facets}
+              onFacetToggle={this.handleFacetToggle}
+              onFilterChange={this.handleFilterChange}
+              openFacets={this.state.openFacets}
+              query={query}
+              referencedComponents={this.state.referencedComponents}
+              referencedLanguages={this.state.referencedLanguages}
+              referencedRules={this.state.referencedRules}
+              referencedUsers={this.state.referencedUsers}
+            />
+          </PageFilters>
+        </PageSide>
 
-          <div className="page-main">
-            <header className="page-header">
-              <div className="page-actions">
-                {this.state.loading && <i className="spinner spacer-right" />}
-                {paging != null &&
-                  <span>
-                    <strong>{formatMeasure(paging.total, 'INT')}</strong> issues
-                  </span>}
-              </div>
-            </header>
-
+        <PageMain>
+          <header className="page-header">
             {JSON.stringify(query)}
 
-            {issues != null &&
-              <div>
-                {openIssue != null &&
-                  <IssuesSourceViewerContainer
-                    issue={openIssue}
-                    displayAllIssues={true}
-                    onIssueSelect={this.handleIssueClick}
+            <div className="page-actions">
+              {this.state.loading && <i className="spinner spacer-right" />}
+              {paging != null &&
+                <span>
+                  <strong>{formatMeasure(paging.total, 'INT')}</strong> issues
+                </span>}
+            </div>
+          </header>
+
+          {issues != null &&
+            <div>
+              {openIssue != null &&
+                <IssuesSourceViewerContainer
+                  issue={openIssue}
+                  displayAllIssues={true}
+                  onIssueSelect={this.handleIssueClick}
+                />}
+
+              <div className={openIssue != null ? 'hidden' : undefined}>
+                <IssuesListContainer
+                  issues={issues}
+                  onIssueClick={this.handleIssueClick}
+                  selected={selected}
+                />
+
+                {paging != null &&
+                  <ListFooter
+                    total={paging.total}
+                    count={issues.length}
+                    loadMore={this.fetchMoreIssues}
                   />}
-
-                <div className={openIssue != null ? 'hidden' : undefined}>
-                  <IssuesListContainer
-                    issues={issues}
-                    onIssueClick={this.handleIssueClick}
-                    selected={selected}
-                  />
-
-                  {paging != null &&
-                    <ListFooter
-                      total={paging.total}
-                      count={issues.length}
-                      loadMore={this.fetchMoreIssues}
-                    />}
-                </div>
-              </div>}
-          </div>
-        </div>
-      </div>
+              </div>
+            </div>}
+        </PageMain>
+      </Page>
     );
   }
 }

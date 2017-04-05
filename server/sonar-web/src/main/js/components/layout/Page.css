@@ -1,0 +1,6 @@
+.layout-page {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  flex-grow: 1;
+}

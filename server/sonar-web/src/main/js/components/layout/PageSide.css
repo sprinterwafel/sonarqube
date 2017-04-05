@@ -1,0 +1,39 @@
+.layout-page-side,
+.layout-page-side-sticky {
+  width: calc(50vw - 360px);
+  background-color: #f3f3f3;
+}
+
+.layout-page-side {
+  flex-grow: 0;
+  flex-shrink: 0;
+  border-right: 1px solid #e6e6e6;
+}
+
+.layout-page-side-sticky {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.layout-page-side-inner {
+  width: 300px;
+  margin-left: calc(50vw - 660px);
+
+  background-color: #f3f3f3;
+}
+
+@media (max-width: 1320px) {
+  .layout-page-side,
+  .layout-page-side-sticky {
+    width: 300px;
+  }
+
+  .layout-page-side-inner {
+    margin-left: 0;
+  }
+}

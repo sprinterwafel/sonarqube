@@ -34,7 +34,7 @@ export default class IssuesList extends React.PureComponent {
     const { issues } = this.props;
 
     return (
-      <div className="search-navigator-workspace-list">
+      <div>
         {issues.map((issue, index) => (
           <ListItem
             key={issue.key}

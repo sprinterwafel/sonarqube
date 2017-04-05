@@ -24,6 +24,10 @@ import ProjectsListFooterContainer from './ProjectsListFooterContainer';
 import PageSidebar from './PageSidebar';
 import VisualizationsContainer from '../visualizations/VisualizationsContainer';
 import { parseUrlQuery } from '../store/utils';
+import Page from '../../../components/layout/Page';
+import PageMain from '../../../components/layout/PageMain';
+import PageSide from '../../../components/layout/PageSide';
+import PageFilters from '../../../components/layout/PageFilters';
 import '../styles.css';
 
 export default class AllProjects extends React.Component {
@@ -95,17 +99,18 @@ export default class AllProjects extends React.Component {
     const top = this.props.organization ? 95 : 30;
 
     return (
-      <div className="page-with-sidebar page-with-left-sidebar projects-page">
-        <aside className="page-sidebar-fixed page-sidebar-sticky projects-sidebar">
-          <div className="page-sidebar-sticky-inner" style={{ top }}>
+      <Page className="projects-page">
+        <PageSide top={top}>
+          <PageFilters>
             <PageSidebar
               query={query}
               isFavorite={this.props.isFavorite}
               organization={this.props.organization}
             />
-          </div>
-        </aside>
-        <div className="page-main">
+          </PageFilters>
+        </PageSide>
+
+        <PageMain>
           <PageHeaderContainer onViewChange={this.handleViewChange} view={view} />
           {view === 'list' &&
             <ProjectsListContainer
@@ -125,8 +130,8 @@ export default class AllProjects extends React.Component {
               sort={query.sort}
               visualization={visualization}
             />}
-        </div>
-      </div>
+        </PageMain>
+      </Page>
     );
   }
 }

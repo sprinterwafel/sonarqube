@@ -17,25 +17,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+// @flow
 import React from 'react';
-import Helmet from 'react-helmet';
-import { translate } from '../../../helpers/l10n';
+import './PageMain.css';
 
-export default class App extends React.Component {
-  componentDidMount() {
-    document.querySelector('html').classList.add('dashboard-page');
-  }
+type Props = {
+  children?: React.Element<*>
+};
 
-  componentWillUnmount() {
-    document.querySelector('html').classList.remove('dashboard-page');
-  }
+const PageMain = (props: Props) => (
+  <div className="layout-page-main">
+    {props.children}
+  </div>
+);
 
-  render() {
-    return (
-      <div id="projects-page">
-        <Helmet title={translate('projects.page')} titleTemplate="%s - SonarQube" />
-        {this.props.children}
-      </div>
-    );
-  }
-}
+export default PageMain;
