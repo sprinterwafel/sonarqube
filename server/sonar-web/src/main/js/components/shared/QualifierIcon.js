@@ -18,13 +18,26 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import React from 'react';
+import classNames from 'classnames';
 
-export default React.createClass({
+type Props = {
+  className?: string,
+  qualifier: ?string
+};
+
+export default class QualifierIcon extends React.PureComponent {
+  props: Props;
+
   render() {
     if (!this.props.qualifier) {
       return null;
     }
-    const className = 'icon-qualifier-' + this.props.qualifier.toLowerCase();
+
+    const className = classNames(
+      'icon-qualifier-' + this.props.qualifier.toLowerCase(),
+      this.props.className
+    );
+
     return <i className={className} />;
   }
-});
+}
