@@ -20,8 +20,10 @@
 package org.sonar.api.batch.fs.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -60,7 +62,7 @@ public class TestInputFileBuilder {
 
   public TestInputFileBuilder(String moduleKey, String relativePath, int id) {
     this.moduleKey = moduleKey;
-    this.moduleBaseDir = Paths.get(moduleKey);
+    setModuleBaseDir(Paths.get(moduleKey));
     this.relativePath = PathUtils.sanitize(relativePath);
     this.id = id;
   }
@@ -74,7 +76,11 @@ public class TestInputFileBuilder {
   }
 
   public TestInputFileBuilder setModuleBaseDir(Path moduleBaseDir) {
-    this.moduleBaseDir = moduleBaseDir.normalize();
+    try {
+      this.moduleBaseDir = moduleBaseDir.normalize().toRealPath(new LinkOption[] {LinkOption.NOFOLLOW_LINKS});
+    } catch (IOException e) {
+      this.moduleBaseDir = moduleBaseDir.normalize();
+    }
     return this;
   }
 
