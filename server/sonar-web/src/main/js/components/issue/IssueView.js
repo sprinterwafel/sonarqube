@@ -29,11 +29,12 @@ import ChangelogPopup from './popups/ChangelogPopup';
 import IssueChangelog from './components/IssueChangelog';
 import IssueMessage from './components/IssueMessage';
 import IssueType from './components/IssueType';
+import IssueSeverity from './components/IssueSeverity';
 import SetTypePopup from './popups/SetTypePopup';
-import SeverityHelper from '../../components/shared/SeverityHelper';
+import SetSeverityPopup from './popups/SetSeverityPopup';
 import StatusHelper from '../../components/shared/StatusHelper';
 import TagsList from '../../components/tags/TagsList';
-import { setIssueType } from '../../api/issues';
+import { setIssueType, setIssueSeverity } from '../../api/issues';
 import { getSingleIssueUrl } from '../../helpers/urls';
 import { translate, translateWithParameters } from '../../helpers/l10n';
 import type { Issue } from './types';
@@ -70,16 +71,26 @@ export default class IssueView extends React.PureComponent {
     this.props.togglePopup('changelog', open);
   };
 
+  toggleSetSeverity = (open?: boolean) => {
+    this.props.togglePopup('set-severity', open);
+  };
+
   toggleSetType = (open?: boolean) => {
     this.props.togglePopup('set-type', open);
   };
 
-  setType = (type: string) => {
+  setIssueProperty(property: string, apiCall: (Object) => Promise<*>, value: string) {
     const { issue } = this.props;
-    const newIssue = { ...issue, type };
-    this.props.onIssueChange(issue, newIssue, setIssueType({ issue: issue.key, type }));
-    this.toggleSetType(false);
-  };
+    if (issue[property] !== value) {
+      const newIssue = { ...issue, [property]: value };
+      this.props.onIssueChange(issue, newIssue, apiCall({ issue: issue.key, [property]: value }));
+    }
+    this.props.togglePopup('set-' + property, false);
+  }
+
+  setSeverity = (severity: string) => this.setIssueProperty('severity', setIssueSeverity, severity);
+
+  setType = (type: string) => this.setIssueProperty('type', setIssueType, type);
 
   render() {
     const { issue } = this.props;
@@ -172,15 +183,17 @@ export default class IssueView extends React.PureComponent {
                     </BubblePopupHelper>
                   </li>
                   <li className="issue-meta">
-                    {canSetSeverity &&
-                      <button className={classNames(btnClass, 'js-issue-set-severity')}>
-                        <span className="issue-meta-label">
-                          <SeverityHelper severity={issue.severity} />
-                        </span>
-                        {' '}
-                        <i className="icon-dropdown" />
-                      </button>}
-                    {!canSetSeverity && <SeverityHelper severity={issue.severity} />}
+                    <BubblePopupHelper
+                      isOpen={this.props.currentPopup === 'set-severity' && canSetSeverity}
+                      position="bottomleft"
+                      togglePopup={this.toggleSetSeverity}
+                      popup={<SetSeverityPopup issue={issue} onSelect={this.setSeverity} />}>
+                      <IssueSeverity
+                        issue={issue}
+                        canSetSeverity={canSetSeverity}
+                        onClick={this.toggleSetSeverity}
+                      />
+                    </BubblePopupHelper>
                   </li>
                   <li className="issue-meta">
                     {hasTransitions &&

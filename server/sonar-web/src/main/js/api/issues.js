@@ -20,6 +20,13 @@
 // @flow
 import { getJSON, post, postJSON } from '../helpers/request';
 
+type IssueResponse = {
+  components?: Array<*>,
+  issue: {},
+  rules?: Array<*>,
+  users?: Array<*>
+};
+
 type IssuesResponse = {
   components?: Array<*>,
   debtTotal?: number,
@@ -33,6 +40,15 @@ type IssuesResponse = {
   rules?: Array<*>,
   users?: Array<*>
 };
+
+export type Transition =
+  | 'confirm'
+  | 'unconfirm'
+  | 'reopen'
+  | 'resolve'
+  | 'falsepositive'
+  | 'wontfix'
+  | 'close';
 
 export const searchIssues = (query: {}): Promise<IssuesResponse> =>
   getJSON('/api/issues/search', query);
@@ -95,7 +111,12 @@ export function getIssueFilters() {
   return getJSON(url).then(r => r.issueFilters);
 }
 
-export function setIssueType(data: { issue: string, type: string }) {
+export function setIssueSeverity(data: { issue: string, severity: string }): Promise<*> {
+  const url = '/api/issues/set_severity';
+  return postJSON(url, data);
+}
+
+export function setIssueType(data: { issue: string, type: string }): Promise<IssueResponse> {
   const url = '/api/issues/set_type';
   return postJSON(url, data);
 }

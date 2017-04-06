@@ -21,9 +21,9 @@
 import React from 'react';
 import { translate } from '../../../helpers/l10n';
 import BubblePopup from '../../../components/common/BubblePopup';
-import IssueTypeIcon from '../../../components/ui/IssueTypeIcon';
 import SelectList from '../../../components/common/SelectList';
 import SelectListItem from '../../../components/common/SelectListItem';
+import SeverityIcon from '../../../components/shared/SeverityIcon';
 import type { Issue } from '../types';
 
 type Props = {
@@ -32,9 +32,9 @@ type Props = {
   popupPosition?: {}
 };
 
-const TYPES = ['BUG', 'VULNERABILITY', 'CODE_SMELL'];
+const SEVERITY = ['BLOCKER', 'CRITICAL', 'MAJOR', 'MINOR', 'INFO'];
 
-export default class SetTypePopup extends React.PureComponent {
+export default class SetSeverityPopup extends React.PureComponent {
   props: Props;
 
   render() {
@@ -43,13 +43,13 @@ export default class SetTypePopup extends React.PureComponent {
         position={this.props.popupPosition}
         customClass="bubble-popup-menu bubble-popup-bottom">
         <SelectList
-          items={TYPES}
-          currentItem={this.props.issue.type}
+          items={SEVERITY}
+          currentItem={this.props.issue.severity}
           onSelect={this.props.onSelect}>
-          {TYPES.map(type => (
-            <SelectListItem key={type} item={type}>
-              <IssueTypeIcon className="little-spacer-right" query={type} />
-              {translate('issue.type', type)}
+          {SEVERITY.map(severity => (
+            <SelectListItem key={severity} item={severity}>
+              <SeverityIcon className="little-spacer-right" severity={severity} />
+              {translate('severity', severity)}
             </SelectListItem>
           ))}
         </SelectList>
