@@ -30,7 +30,7 @@ import IssueChangelog from './components/IssueChangelog';
 import IssueMessage from './components/IssueMessage';
 import IssueType from './components/IssueType';
 import SetTypePopup from './popups/SetTypePopup';
-import SeverityHelper from '../../components/shared/severity-helper';
+import SeverityHelper from '../../components/shared/SeverityHelper';
 import StatusHelper from '../../components/shared/StatusHelper';
 import TagsList from '../../components/tags/TagsList';
 import { setIssueType } from '../../api/issues';

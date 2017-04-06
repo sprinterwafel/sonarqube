@@ -24,7 +24,7 @@ import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
 import FacetItem from './components/FacetItem';
 import FacetItemsList from './components/FacetItemsList';
-import SeverityHelper from '../../../components/shared/severity-helper';
+import SeverityHelper from '../../../components/shared/SeverityHelper';
 import { translate } from '../../../helpers/l10n';
 
 type Props = {|

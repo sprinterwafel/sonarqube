@@ -17,21 +17,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+//@flow
 import React from 'react';
-import SeverityIcon from './severity-icon';
+import SeverityIcon from './SeverityIcon';
 import { translate } from '../../helpers/l10n';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
-    return (
-      <span>
-        <SeverityIcon severity={this.props.severity} />
-        {' '}
-        {translate('severity', this.props.severity)}
-      </span>
-    );
+export default function SeverityHelper(props: { severity: ?string, className?: string }) {
+  const { severity } = props;
+  if (!severity) {
+    return null;
   }
-});
+  return (
+    <span className={props.className}>
+      <SeverityIcon className="little-spacer-right" severity={severity} />
+      {translate('severity', severity)}
+    </span>
+  );
+}
