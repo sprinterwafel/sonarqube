@@ -22,25 +22,12 @@ import React from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 import { max } from 'lodash';
-// import { orderBy, without } from 'lodash';
 import FacetBox from './components/FacetBox';
 import FacetHeader from './components/FacetHeader';
-// import FacetItem from './components/FacetItem';
 import { BarChart } from '../../../components/charts/bar-chart';
 import DateInput from '../../../components/controls/DateInput';
 import { translate } from '../../../helpers/l10n';
 import { formatMeasure } from '../../../helpers/measures';
-
-{
-  /*<FacetItem
-                active={this.props.types.includes(type)}
-                key={type}
-                name={<span><IssueTypeIcon query={type} /> {translate('issue.type', type)}</span>}
-                onClick={this.handleItemClick}
-                stat={this.getStat(type)}
-                value={type}
-              />*/
-}
 
 type Props = {|
   createdAfter: string,
@@ -65,22 +52,9 @@ export default class CreationDateFacet extends React.PureComponent {
 
   property = 'createdAt';
 
-  // handleItemClick = (itemValue: string) => {
-  //   const { types } = this.props;
-  //   const newValue = orderBy(
-  //     types.includes(itemValue) ? without(types, itemValue) : [...types, itemValue]
-  //   );
-  //   this.props.onChange({ [this.property]: newValue });
-  // };
-
   handleHeaderClick = () => {
     this.props.onToggle(this.property);
   };
-
-  // getStat(type: string): ?number {
-  //   const { stats } = this.props;
-  //   return stats ? stats[type] : null;
-  // }
 
   resetTo = (changes: {}) => {
     this.props.onChange({
