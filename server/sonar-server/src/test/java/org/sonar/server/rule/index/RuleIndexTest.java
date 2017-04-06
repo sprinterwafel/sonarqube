@@ -49,7 +49,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.data.MapEntry.entry;
+import static org.assertj.guava.api.Assertions.entry;
 import static org.junit.Assert.fail;
 import static org.sonar.api.rule.Severity.BLOCKER;
 import static org.sonar.api.rule.Severity.CRITICAL;
@@ -734,6 +734,38 @@ public class RuleIndexTest {
   }
 
   @Test
+  public void tags_facet_should_return_top_10_items() {
+    // default number of items returned in facets = 10
+    RuleDefinitionDto rule = insertRuleDefinition(setSystemTags("tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tagA", "tagB"));
+
+    RuleQuery query = new RuleQuery()
+      .setOrganizationUuid(dbTester.getDefaultOrganization().getUuid());
+    SearchOptions options = new SearchOptions().addFacets(singletonList(FACET_TAGS));
+    SearchIdResult result = index.search(query, options);
+    assertThat(result.getFacets().get(FACET_TAGS)).containsExactly(entry("tag1", 1L), entry("tag2", 1L), entry("tag3", 1L), entry("tag4", 1L), entry("tag5", 1L),
+      entry("tag6", 1L), entry("tag7", 1L), entry("tag8", 1L), entry("tag9", 1L), entry("tagA", 1L));
+  }
+
+  @Test
+  public void tags_facet_should_include_matching_selected_items() {
+    // default number of items returned in facets = 10
+    RuleDefinitionDto rule = insertRuleDefinition(setSystemTags("tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tagA", "tagB"));
+
+    RuleQuery query = new RuleQuery()
+      .setOrganizationUuid(dbTester.getDefaultOrganization().getUuid())
+      .setTags(singletonList("tagB"));
+    SearchOptions options = new SearchOptions().addFacets(singletonList(FACET_TAGS));
+    SearchIdResult result = index.search(query, options);
+    assertThat(result.getFacets().get(FACET_TAGS).entrySet()).extracting(e -> entry(e.getKey(), e.getValue())).containsExactly(
+
+      // check that selected item is added, although there are 10 other items
+      entry("tagB", 1L),
+
+      entry("tag1", 1L), entry("tag2", 1L), entry("tag3", 1L), entry("tag4", 1L), entry("tag5", 1L), entry("tag6", 1L), entry("tag7", 1L), entry("tag8", 1L), entry("tag9", 1L),
+      entry("tagA", 1L));
+  }
+
+  @Test
   public void tags_facet_should_not_find_tags_of_any_other_organization() {
     OrganizationDto organization1 = dbTester.organizations().insert();
     OrganizationDto organization2 = dbTester.organizations().insert();
@@ -809,7 +841,7 @@ public class RuleIndexTest {
       .setTypes(asList(BUG, CODE_SMELL));
 
     SearchIdResult result = index.search(query, new SearchOptions().addFacets(asList(FACET_LANGUAGES, FACET_REPOSITORIES, FACET_TAGS,
-        FACET_TYPES)));
+      FACET_TYPES)));
     assertThat(result.getIds()).hasSize(2);
     assertThat(result.getFacets().getAll()).hasSize(4);
     assertThat(result.getFacets().get(FACET_LANGUAGES).keySet()).containsOnly("cpp", "java");
@@ -922,16 +954,56 @@ public class RuleIndexTest {
     assertThat(tester.countDocuments(INDEX_TYPE_ACTIVE_RULE)).isEqualTo(3);
 
     // 1. get all active rules.
-    assertThat(index.searchAll(new RuleQuery().setActivation(true))).containsOnly(rule1Key, rule2Key);
+    assertThat(index.searchAll(new RuleQuery().setActivation(true)))
+      .containsOnly(rule1Key, rule2Key);
 
     // 2. get all inactive rules.
-    assertThat(index.searchAll(new RuleQuery().setActivation(false))).containsOnly(rule3Key);
+    assertThat(index.searchAll(new RuleQuery().setActivation(false)))
+      .containsOnly(rule3Key);
 
     // 3. get all rules not active on profile
-    assertThat(index.searchAll(new RuleQuery().setActivation(false).setQProfileKey(QUALITY_PROFILE_KEY2))).containsOnly(rule2Key, rule3Key);
+    assertThat(index.searchAll(new RuleQuery().setActivation(false).setQProfileKey(QUALITY_PROFILE_KEY2)))
+      .containsOnly(rule2Key, rule3Key);
 
     // 4. get all active rules on profile
-    assertThat(index.searchAll(new RuleQuery().setActivation(true).setQProfileKey(QUALITY_PROFILE_KEY2))).containsOnly(rule1Key);
+    assertThat(index.searchAll(new RuleQuery().setActivation(true).setQProfileKey(QUALITY_PROFILE_KEY2)))
+      .containsOnly(rule1Key);
+  }
+
+  @Test
+  public void search_all_keys_by_profile_in_specific_organization() {
+    RuleDefinitionDto rule1 = insertRuleDefinition();
+    RuleDefinitionDto rule2 = insertRuleDefinition();
+    RuleDefinitionDto rule3 = insertRuleDefinition();
+
+    RuleKey rule1Key = rule1.getKey();
+    RuleKey rule2Key = rule2.getKey();
+    RuleKey rule3Key = rule3.getKey();
+
+    OrganizationDto organization = dbTester.organizations().insert();
+
+    indexActiveRules(
+      ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY1, rule1Key)).setOrganizationUuid(organization.getUuid()),
+      ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY2, rule1Key)).setOrganizationUuid(organization.getUuid()),
+      ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY1, rule2Key)).setOrganizationUuid(organization.getUuid()));
+
+    assertThat(tester.countDocuments(INDEX_TYPE_ACTIVE_RULE)).isEqualTo(3);
+
+    // 1. get all active rules.
+    assertThat(index.searchAll(new RuleQuery().setActivation(true).setOrganizationUuid(organization.getUuid())))
+      .containsOnly(rule1Key, rule2Key);
+
+    // 2. get all inactive rules.
+    assertThat(index.searchAll(new RuleQuery().setActivation(false).setOrganizationUuid(organization.getUuid())))
+      .containsOnly(rule3Key);
+
+    // 3. get all rules not active on profile
+    assertThat(index.searchAll(new RuleQuery().setActivation(false).setOrganizationUuid(organization.getUuid()).setQProfileKey(QUALITY_PROFILE_KEY2)))
+      .containsOnly(rule2Key, rule3Key);
+
+    // 4. get all active rules on profile
+    assertThat(index.searchAll(new RuleQuery().setActivation(true).setOrganizationUuid(organization.getUuid()).setQProfileKey(QUALITY_PROFILE_KEY2)))
+      .containsOnly(rule1Key);
   }
 
   @SafeVarargs
