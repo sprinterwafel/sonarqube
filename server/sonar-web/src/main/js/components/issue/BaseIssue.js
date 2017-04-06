@@ -29,7 +29,7 @@ type Props = {
   onClick: (string) => void,
   onFail: (Error) => void,
   onFilterClick?: () => void,
-  onIssueChange: ({}) => void,
+  onIssueChange: (Issue, Issue, Promise<*>) => void,
   selected: boolean
 };
 
@@ -38,6 +38,7 @@ type State = {
 };
 
 export default class BaseIssue extends React.PureComponent {
+  mounted: boolean;
   props: Props;
   state: State;
 
@@ -53,7 +54,7 @@ export default class BaseIssue extends React.PureComponent {
   }
 
   componentDidMount() {
-    //this.renderIssueView();
+    this.mounted = true;
     if (this.props.selected) {
       this.bindShortcuts();
     }
@@ -63,11 +64,9 @@ export default class BaseIssue extends React.PureComponent {
     if (!nextProps.selected && this.props.selected) {
       this.unbindShortcuts();
     }
-    //this.destroyIssueView();
   }
 
   componentDidUpdate(prevProps: Props) {
-    //this.renderIssueView();
     if (!prevProps.selected && this.props.selected) {
       this.bindShortcuts();
     }
@@ -79,10 +78,10 @@ export default class BaseIssue extends React.PureComponent {
   }
 
   componentWillUnmount() {
+    this.mounted = false;
     if (this.props.selected) {
       this.unbindShortcuts();
     }
-    //this.destroyIssueView();
   }
 
   bindShortcuts() {
@@ -94,17 +93,19 @@ export default class BaseIssue extends React.PureComponent {
   }
 
   togglePopup = (popupName: string, open?: boolean) => {
-    if (open) {
-      this.setState({ currentPopup: popupName });
-    } else {
-      this.setState((prevState: State) => {
-        if (prevState.currentPopup === popupName) {
-          return { currentPopup: '' };
-        } else if (open == null) {
-          return { currentPopup: popupName };
-        }
-        return prevState;
-      });
+    if (this.mounted) {
+      if (open) {
+        this.setState({ currentPopup: popupName });
+      } else {
+        this.setState((prevState: State) => {
+          if (prevState.currentPopup === popupName) {
+            return { currentPopup: '' };
+          } else if (open == null) {
+            return { currentPopup: popupName };
+          }
+          return prevState;
+        });
+      }
     }
   };
 
@@ -131,26 +132,6 @@ export default class BaseIssue extends React.PureComponent {
       }
     }
   };
-
-  /*destroyIssueView() {
-    this.issueView.destroy();
-  }
-
-  renderIssueView() {
-    //const model = this.props.issue.toJSON ? this.props.issue : new IssueModel(this.props.issue);
-    this.issueView = new IssueView({
-      issue,
-      checked: this.props.checked,
-      onCheck: this.props.onCheck,
-      onClick: this.props.onClick,
-      onFilterClick: this.props.onFilterClick,
-      onIssueChange: this.props.onIssueChange
-    });
-    this.issueView.render().$el.appendTo(this.node);
-    if (this.props.selected) {
-      this.issueView.select();
-    }
-  }*/
 
   render() {
     return (

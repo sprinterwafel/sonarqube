@@ -21,13 +21,10 @@
 import { connect } from 'react-redux';
 import BaseIssue from './BaseIssue';
 import { onFail } from '../../store/rootActions';
-import { receiveIssues } from '../../store/issues/duck';
+import { updateIssue } from './actions';
 
 const mapDispatchToProps = {
-  onIssueChange: issue =>
-    dispatch => {
-      dispatch(receiveIssues([issue]));
-    },
+  onIssueChange: updateIssue,
   onFail: error => dispatch => onFail(dispatch)(error)
 };
 

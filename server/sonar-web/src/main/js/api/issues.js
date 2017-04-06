@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 // @flow
-import { getJSON, post } from '../helpers/request';
+import { getJSON, post, postJSON } from '../helpers/request';
 
 type IssuesResponse = {
   components?: Array<*>,
@@ -93,6 +93,11 @@ export function getIssueChangelog(issue: string): Promise<*> {
 export function getIssueFilters() {
   const url = '/api/issue_filters/search';
   return getJSON(url).then(r => r.issueFilters);
+}
+
+export function setIssueType(data: { issue: string, type: string }) {
+  const url = '/api/issues/set_type';
+  return postJSON(url, data);
 }
 
 export const bulkChangeIssues = (issueKeys: Array<string>, query: {}) =>

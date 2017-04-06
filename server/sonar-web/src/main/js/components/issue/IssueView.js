@@ -28,10 +28,13 @@ import Checkbox from '../../components/controls/Checkbox';
 import ChangelogPopup from './popups/ChangelogPopup';
 import IssueChangelog from './components/IssueChangelog';
 import IssueMessage from './components/IssueMessage';
-import IssueTypeIcon from '../../components/ui/IssueTypeIcon';
+import IssueType from './components/IssueType';
+import SetTypePopup from './popups/SetTypePopup';
 import SeverityHelper from '../../components/shared/severity-helper';
 import StatusHelper from '../../components/shared/StatusHelper';
 import TagsList from '../../components/tags/TagsList';
+import { setIssueType } from '../../api/issues';
+import { getSingleIssueUrl } from '../../helpers/urls';
 import { translate, translateWithParameters } from '../../helpers/l10n';
 import type { Issue } from './types';
 
@@ -43,7 +46,7 @@ type Props = {
   onClick: (string) => void,
   onFail: (Error) => void,
   onFilterClick?: () => void,
-  onIssueChange: ({}) => void,
+  onIssueChange: (Issue, Issue, Promise<*>) => void,
   selected: boolean,
   togglePopup: (string) => void
 };
@@ -56,18 +59,27 @@ export default class IssueView extends React.PureComponent {
     this.issueModel = nextProps.issue.toJSON ? nextProps.issue : new IssueModel(nextProps.issue);
   }
 
+  handleClick = (evt: MouseEvent) => {
+    evt.preventDefault();
+    if (this.props.onClick) {
+      this.props.onClick(this.props.issue.key);
+    }
+  };
+
   toggleChangelog = (open?: boolean) => {
     this.props.togglePopup('changelog', open);
   };
 
-  renderChangeLogView() {}
-  renderTransitionsFormView() {}
-  renderAssignFormView() {}
-  renderCommentFormView() {}
-  renderDeleteCommentView() {}
-  renderSetSeverityFormView() {}
-  renderSetTypeFormView() {}
-  renderTagsFormView() {}
+  toggleSetType = (open?: boolean) => {
+    this.props.togglePopup('set-type', open);
+  };
+
+  setType = (type: string) => {
+    const { issue } = this.props;
+    const newIssue = { ...issue, type };
+    this.props.onIssueChange(issue, newIssue, setIssueType({ issue: issue.key, type }));
+    this.toggleSetType(false);
+  };
 
   render() {
     const { issue } = this.props;
@@ -77,11 +89,9 @@ export default class IssueView extends React.PureComponent {
     const canSetSeverity = issue.actions.includes('set_severity');
     const canSetTags = issue.actions.includes('set_tags');
     const hasCheckbox = this.props.onCheck != null;
-    const hasSecondaryLocations = issue.flows.length > 0;
     const hasSimilarIssuesFilter = this.props.onFilterClick != null;
     const hasTransitions = issue.transitions && issue.transitions.length > 0;
 
-    const permalink = '';
     const issueClass = classNames('issue', {
       'issue-with-checkbox': hasCheckbox,
       selected: this.props.selected
@@ -90,7 +100,7 @@ export default class IssueView extends React.PureComponent {
     const commentBtnClass = 'button-link icon-half-transparent';
 
     return (
-      <div className={issueClass}>
+      <div className={issueClass} onClick={this.handleClick} tabIndex={0} role="listitem">
         <table className="issue-table">
           <tbody>
             <tr>
@@ -121,20 +131,19 @@ export default class IssueView extends React.PureComponent {
                         L{issue.line}
                       </span>
                     </li>}
-                  {hasSecondaryLocations &&
-                    <li className="issue-meta issue-meta-locations">
-                      <button className="button-link issue-action js-issue-locations">
-                        <i className="icon-issue-flow" />
-                      </button>
-                    </li>}
                   <li className="issue-meta">
-                    <a className="js-issue-permalink icon-link" href={permalink} target="_blank" />
+                    <a
+                      className="js-issue-permalink icon-link"
+                      href={getSingleIssueUrl(issue.key)}
+                      target="_blank"
+                    />
                   </li>
                   {hasSimilarIssuesFilter &&
                     <li className="issue-meta">
                       <button
                         className={classNames(btnClass, 'js-issue-filter')}
-                        aria-label={translate('issue.filter_similar_issues')}>
+                        aria-label={translate('issue.filter_similar_issues')}
+                        onClick={this.props.onFilterClick}>
                         <i className="icon-filter icon-half-transparent" />{' '}
                         <i className="icon-dropdown" />
                       </button>
@@ -149,19 +158,19 @@ export default class IssueView extends React.PureComponent {
             <tr>
               <td>
                 <ul className="list-inline issue-meta-list">
-                  {canSetSeverity &&
-                    <li className="issue-meta">
-                      <button className={classNames(btnClass, 'js-issue-set-type')}>
-                        <IssueTypeIcon query={issue.type} />{' '}
-                        {translate('issue.type', issue.type)}{' '}
-                        <i className="icon-dropdown" />
-                      </button>
-                    </li>}
-                  {!canSetSeverity &&
-                    <li className="issue-meta">
-                      <IssueTypeIcon query={issue.type} />{' '}
-                      {translate('issue.type', issue.type)}
-                    </li>}
+                  <li className="issue-meta">
+                    <BubblePopupHelper
+                      isOpen={this.props.currentPopup === 'set-type' && canSetSeverity}
+                      position="bottomleft"
+                      togglePopup={this.toggleSetType}
+                      popup={<SetTypePopup issue={issue} onSelect={this.setType} />}>
+                      <IssueType
+                        issue={issue}
+                        canSetType={canSetSeverity}
+                        onClick={this.toggleSetType}
+                      />
+                    </BubblePopupHelper>
+                  </li>
                   <li className="issue-meta">
                     {canSetSeverity &&
                       <button className={classNames(btnClass, 'js-issue-set-severity')}>
