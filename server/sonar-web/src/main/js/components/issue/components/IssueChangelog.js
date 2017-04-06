@@ -31,7 +31,6 @@ export default class IssueChangelog extends React.PureComponent {
 
   handleClick = (evt: SyntheticInputEvent) => {
     evt.preventDefault();
-    evt.stopPropagation();
     this.props.onClick();
   };
 

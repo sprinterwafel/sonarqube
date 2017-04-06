@@ -32,8 +32,7 @@ type Props = {
 export default class IssueType extends React.PureComponent {
   props: Props;
 
-  handleClick = (evt: SyntheticInputEvent) => {
-    evt.stopPropagation();
+  handleClick = () => {
     this.props.onClick();
   };
 

@@ -71,6 +71,10 @@ export default class BubblePopupPositionHelper extends React.PureComponent {
     }
   };
 
+  handleClick(evt: SyntheticInputEvent) {
+    evt.stopPropagation();
+  }
+
   getPosition(props: Props) {
     const containerPos = this.container.getBoundingClientRect();
     const { position } = props;
@@ -84,7 +88,12 @@ export default class BubblePopupPositionHelper extends React.PureComponent {
 
   render() {
     return (
-      <div className="bubble-popup-positioner" ref={container => this.container = container}>
+      <div
+        className="bubble-popup-positioner"
+        ref={container => this.container = container}
+        onClick={this.handleClick}
+        tabIndex={0}
+        role="tooltip">
         {this.props.children}
         {this.props.isOpen &&
           <div ref={popupContainer => this.popupContainer = popupContainer}>
