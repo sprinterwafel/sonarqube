@@ -44,6 +44,21 @@ import PageSide from '../../../components/layout/PageSide';
 import PageFilters from '../../../components/layout/PageFilters';
 import { translate } from '../../../helpers/l10n';
 
+// TODO project-level page
+// TODO conditionaly show organization/project in breadcrumbs
+// TODO my issues filter
+// TODO bulk change
+// TODO issue checkboxes
+// TODO filter similar issues
+// TODO issue permalink
+// TODO request facets on demand
+// TODO clear filters
+// TODO reload button
+// TODO redirect from old-style urls
+// TODO no results
+// TODO issues/debt display mode
+// TODO sticky header
+
 type Props = {
   fetchIssues: () => Promise<*>,
   location: { pathname: string, query: { [string]: string } },

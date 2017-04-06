@@ -165,7 +165,6 @@ export default class CreationDateFacet extends React.PureComponent {
   }
 
   renderPeriodSelectors() {
-    // TODO l10n
     const { createdAfter, createdBefore } = this.props;
 
     return (

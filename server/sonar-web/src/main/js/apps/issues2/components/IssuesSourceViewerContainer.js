@@ -22,6 +22,10 @@ import { connect } from 'react-redux';
 import SourceViewer from '../../../components/SourceViewer/SourceViewer';
 import { getIssueByKey } from '../../../store/rootReducer';
 
+// TODO loading of issues
+// TODO scroll to the selected issue
+// TODO move between issues
+
 const mapStateToProps = (state, ownProps) => {
   const issue = getIssueByKey(state, ownProps.issue);
   return {

@@ -30,6 +30,8 @@ import Avatar from '../../../components/ui/Avatar';
 import { searchUsers } from '../../../api/users';
 import { translate } from '../../../helpers/l10n';
 
+// TODO search org members
+
 type Props = {|
   assigned: boolean,
   assignees: Array<string>,

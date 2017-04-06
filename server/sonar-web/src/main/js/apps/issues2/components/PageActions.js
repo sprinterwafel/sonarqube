@@ -35,19 +35,18 @@ export default class PageActions extends React.Component {
   props: Props;
 
   renderShortcuts() {
-    // TODO l10n
     return (
       <span className="note big-spacer-right">
         <span className="big-spacer-right">
           <span className="shortcut-button little-spacer-right">↑</span>
           <span className="shortcut-button little-spacer-right">↓</span>
-          to select issues
+          {translate('issues.to_select_issues')}
         </span>
 
         <span>
           <span className="shortcut-button little-spacer-right">←</span>
           <span className="shortcut-button little-spacer-right">→</span>
-          to navigate
+          {translate('issues.to_navigate')}
         </span>
       </span>
     );
