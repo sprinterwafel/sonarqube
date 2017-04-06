@@ -19,31 +19,27 @@
  */
 // @flow
 import React from 'react';
-import ComponentBreadcrumbs from './ComponentBreadcrumbs';
-import Issue from '../../../components/issue/Issue';
-import type { Issue as IssueType } from '../../../components/issue/types';
+import { css } from 'glamor';
+import { clearfix } from 'glamor/utils';
 
-type Props = {
-  issue: IssueType,
-  previousIssue: ?Object
-};
+type Props = {|
+  border: boolean,
+  children?: React.Element<*>
+|};
 
-export default class ListItem extends React.PureComponent {
-  props: Props;
+const HeaderPanel = (props: Props) => (
+  <div
+    className={css(clearfix(), {
+      borderBottom: props.border ? '1px solid #e6e6e6' : undefined,
+      margin: '-20px -20px 20px',
+      padding: '16px 20px',
+      lineHeight: '24px',
+      boxSizing: 'border-box',
+      backgroundColor: '#f3f3f3',
+      '& .component-name': { lineHeight: '24px' }
+    })}>
+    {props.children}
+  </div>
+);
 
-  render() {
-    const { issue, previousIssue } = this.props;
-
-    const displayComponent = previousIssue == null || previousIssue.component !== issue.component;
-
-    return (
-      <div className="issues-workspace-list-item">
-        {displayComponent &&
-          <div className="issues-workspace-list-component">
-            <ComponentBreadcrumbs issue={this.props.issue} />
-          </div>}
-        <Issue {...this.props} />
-      </div>
-    );
-  }
-}
+export default HeaderPanel;

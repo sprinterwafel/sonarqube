@@ -26,6 +26,7 @@ import VisualizationsContainer from '../visualizations/VisualizationsContainer';
 import { parseUrlQuery } from '../store/utils';
 import Page from '../../../components/layout/Page';
 import PageMain from '../../../components/layout/PageMain';
+import PageMainInner from '../../../components/layout/PageMainInner';
 import PageSide from '../../../components/layout/PageSide';
 import PageFilters from '../../../components/layout/PageFilters';
 import '../styles.css';
@@ -111,25 +112,27 @@ export default class AllProjects extends React.Component {
         </PageSide>
 
         <PageMain>
-          <PageHeaderContainer onViewChange={this.handleViewChange} view={view} />
-          {view === 'list' &&
-            <ProjectsListContainer
-              isFavorite={this.props.isFavorite}
-              isFiltered={isFiltered}
-              organization={this.props.organization}
-            />}
-          {view === 'list' &&
-            <ProjectsListFooterContainer
-              query={query}
-              isFavorite={this.props.isFavorite}
-              organization={this.props.organization}
-            />}
-          {view === 'visualizations' &&
-            <VisualizationsContainer
-              onVisualizationChange={this.handleVisualizationChange}
-              sort={query.sort}
-              visualization={visualization}
-            />}
+          <PageMainInner>
+            <PageHeaderContainer onViewChange={this.handleViewChange} view={view} />
+            {view === 'list' &&
+              <ProjectsListContainer
+                isFavorite={this.props.isFavorite}
+                isFiltered={isFiltered}
+                organization={this.props.organization}
+              />}
+            {view === 'list' &&
+              <ProjectsListFooterContainer
+                query={query}
+                isFavorite={this.props.isFavorite}
+                organization={this.props.organization}
+              />}
+            {view === 'visualizations' &&
+              <VisualizationsContainer
+                onVisualizationChange={this.handleVisualizationChange}
+                sort={query.sort}
+                visualization={visualization}
+              />}
+          </PageMainInner>
         </PageMain>
       </Page>
     );

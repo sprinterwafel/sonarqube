@@ -45,6 +45,12 @@ export type Query = {|
   types: Array<string>
 |};
 
+export type Paging = {
+  pageIndex: number,
+  pageSize: number,
+  total: number
+};
+
 const parseAsBoolean = (value: ?string, defaultValue: boolean = true): boolean =>
   value === 'false' ? false : value === 'true' ? true : defaultValue;
 

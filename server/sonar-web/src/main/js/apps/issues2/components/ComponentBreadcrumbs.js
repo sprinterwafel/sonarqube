@@ -21,27 +21,27 @@
 import React from 'react';
 import { Link } from 'react-router';
 import Organization from '../../../components/shared/Organization';
-import { collapsePath } from '../../../helpers/path';
+import { collapsePath, limitComponentName } from '../../../helpers/path';
 import { getProjectUrl } from '../../../helpers/urls';
 
 type Props = {
   issue: Object
 };
 
-export default class ListItemComponent extends React.PureComponent {
+export default class ComponentBreadcrumbs extends React.PureComponent {
   props: Props;
 
   render() {
     const { issue } = this.props;
 
     return (
-      <div className="component-name issues-workspace-list-component">
+      <div className="component-name">
         <Organization linkClassName="link-no-underline" organizationKey={issue.organization} />
 
         {issue.project != null &&
           <span>
             <Link to={getProjectUrl(issue.project)} className="link-no-underline">
-              {issue.projectName}
+              {limitComponentName(issue.projectName)}
             </Link>
             <span className="slash-separator" />
           </span>}
@@ -49,7 +49,7 @@ export default class ListItemComponent extends React.PureComponent {
         {issue.subProject != null &&
           <span>
             <Link to={getProjectUrl(issue.subProject)} className="link-no-underline">
-              {issue.subProjectName}
+              {limitComponentName(issue.subProjectName)}
             </Link>
             <span className="slash-separator" />
           </span>}

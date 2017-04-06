@@ -18,32 +18,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 // @flow
-import React from 'react';
+import { connect } from 'react-redux';
 import ComponentBreadcrumbs from './ComponentBreadcrumbs';
-import Issue from '../../../components/issue/Issue';
-import type { Issue as IssueType } from '../../../components/issue/types';
+import { getIssueByKey } from '../../../store/rootReducer';
 
-type Props = {
-  issue: IssueType,
-  previousIssue: ?Object
-};
+const mapStateToProps = (state, ownProps) => ({
+  issue: getIssueByKey(state, ownProps.issue)
+});
 
-export default class ListItem extends React.PureComponent {
-  props: Props;
-
-  render() {
-    const { issue, previousIssue } = this.props;
-
-    const displayComponent = previousIssue == null || previousIssue.component !== issue.component;
-
-    return (
-      <div className="issues-workspace-list-item">
-        {displayComponent &&
-          <div className="issues-workspace-list-component">
-            <ComponentBreadcrumbs issue={this.props.issue} />
-          </div>}
-        <Issue {...this.props} />
-      </div>
-    );
-  }
-}
+export default connect(mapStateToProps)(ComponentBreadcrumbs);
