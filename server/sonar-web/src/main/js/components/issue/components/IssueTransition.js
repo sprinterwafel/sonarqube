@@ -19,35 +19,42 @@
  */
 // @flow
 import React from 'react';
-import SeverityHelper from '../../../components/shared/SeverityHelper';
+import StatusHelper from '../../../components/shared/StatusHelper';
 import type { Issue } from '../types';
 
 type Props = {
-  canSetSeverity: boolean,
+  hasTransitions: boolean,
   issue: Issue,
   onClick: () => void
 };
 
-export default class IssueSeverity extends React.PureComponent {
+export default class IssueTransition extends React.PureComponent {
   props: Props;
 
   render() {
     const { issue } = this.props;
 
-    if (this.props.canSetSeverity) {
+    if (this.props.hasTransitions) {
       return (
         <button
-          className="button-link issue-action issue-action-with-options js-issue-set-severity"
+          className="button-link issue-action issue-action-with-options js-issue-transition"
           onClick={this.props.onClick}>
-          <SeverityHelper
+          <StatusHelper
             className="issue-meta-label little-spacer-right"
-            severity={issue.severity}
+            status={issue.status}
+            resolution={issue.resolution}
           />
           <i className="little-spacer-left icon-dropdown" />
         </button>
       );
     } else {
-      return <SeverityHelper className="issue-meta-label" severity={issue.severity} />;
+      return (
+        <StatusHelper
+          className="issue-meta-label"
+          status={issue.status}
+          resolution={issue.resolution}
+        />
+      );
     }
   }
 }

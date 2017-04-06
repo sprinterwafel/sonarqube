@@ -28,13 +28,14 @@ import Checkbox from '../../components/controls/Checkbox';
 import ChangelogPopup from './popups/ChangelogPopup';
 import IssueChangelog from './components/IssueChangelog';
 import IssueMessage from './components/IssueMessage';
-import IssueType from './components/IssueType';
 import IssueSeverity from './components/IssueSeverity';
-import SetTypePopup from './popups/SetTypePopup';
+import IssueTransition from './components/IssueTransition';
+import IssueType from './components/IssueType';
 import SetSeverityPopup from './popups/SetSeverityPopup';
-import StatusHelper from '../../components/shared/StatusHelper';
+import SetTransitionPopup from './popups/SetTransitionPopup';
+import SetTypePopup from './popups/SetTypePopup';
 import TagsList from '../../components/tags/TagsList';
-import { setIssueType, setIssueSeverity } from '../../api/issues';
+import { setIssueType, setIssueSeverity, setIssueTransition } from '../../api/issues';
 import { getSingleIssueUrl } from '../../helpers/urls';
 import { translate, translateWithParameters } from '../../helpers/l10n';
 import type { Issue } from './types';
@@ -79,18 +80,31 @@ export default class IssueView extends React.PureComponent {
     this.props.togglePopup('set-type', open);
   };
 
-  setIssueProperty(property: string, apiCall: (Object) => Promise<*>, value: string) {
+  toggleSetTransition = (open?: boolean) => {
+    this.props.togglePopup('transition', open);
+  };
+
+  setIssueProperty(
+    property: string,
+    popup: string,
+    apiCall: (Object) => Promise<*>,
+    value: string
+  ) {
     const { issue } = this.props;
     if (issue[property] !== value) {
       const newIssue = { ...issue, [property]: value };
       this.props.onIssueChange(issue, newIssue, apiCall({ issue: issue.key, [property]: value }));
     }
-    this.props.togglePopup('set-' + property, false);
+    this.props.togglePopup(popup, false);
   }
 
-  setSeverity = (severity: string) => this.setIssueProperty('severity', setIssueSeverity, severity);
+  setSeverity = (severity: string) =>
+    this.setIssueProperty('severity', 'set-severity', setIssueSeverity, severity);
 
-  setType = (type: string) => this.setIssueProperty('type', setIssueType, type);
+  setTransition = (transition: string) =>
+    this.setIssueProperty('transition', 'transition', setIssueTransition, transition);
+
+  setType = (type: string) => this.setIssueProperty('type', 'set-type', setIssueType, type);
 
   render() {
     const { issue } = this.props;
@@ -196,14 +210,23 @@ export default class IssueView extends React.PureComponent {
                     </BubblePopupHelper>
                   </li>
                   <li className="issue-meta">
-                    {hasTransitions &&
-                      <button className={classNames(btnClass, 'js-issue-transition')}>
-                        <span className="issue-meta-label">
-                          <StatusHelper status={issue.status} resolution={issue.resolution} />
-                        </span>{' '}<i className="icon-dropdown" />
-                      </button>}
-                    {!hasTransitions &&
-                      <StatusHelper status={issue.status} resolution={issue.resolution} />}
+                    <BubblePopupHelper
+                      isOpen={this.props.currentPopup === 'transition' && hasTransitions}
+                      position="bottomleft"
+                      togglePopup={this.toggleSetTransition}
+                      popup={
+                        <SetTransitionPopup
+                          issue={issue}
+                          transitions={issue.transitions}
+                          onSelect={this.setTransition}
+                        />
+                      }>
+                      <IssueTransition
+                        issue={issue}
+                        hasTransitions={hasTransitions}
+                        onClick={this.toggleSetTransition}
+                      />
+                    </BubblePopupHelper>
                   </li>
                   {canAssign &&
                     <li className="issue-meta">

@@ -116,6 +116,13 @@ export function setIssueSeverity(data: { issue: string, severity: string }): Pro
   return postJSON(url, data);
 }
 
+export function setIssueTransition(
+  data: { issue: string, transition: Transition }
+): Promise<IssueResponse> {
+  const url = '/api/issues/do_transition';
+  return postJSON(url, data);
+}
+
 export function setIssueType(data: { issue: string, type: string }): Promise<IssueResponse> {
   const url = '/api/issues/set_type';
   return postJSON(url, data);

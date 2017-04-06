@@ -32,10 +32,6 @@ type Props = {
 export default class IssueType extends React.PureComponent {
   props: Props;
 
-  handleClick = () => {
-    this.props.onClick();
-  };
-
   render() {
     const { issue } = this.props;
 
@@ -43,7 +39,7 @@ export default class IssueType extends React.PureComponent {
       return (
         <button
           className="button-link issue-action issue-action-with-options js-issue-set-type"
-          onClick={this.handleClick}>
+          onClick={this.props.onClick}>
           <IssueTypeIcon className="little-spacer-right" query={issue.type} />
           {translate('issue.type', issue.type)}
           <i className="little-spacer-left icon-dropdown" />

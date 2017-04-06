@@ -19,8 +19,9 @@
  */
 //@flow
 import React from 'react';
+import classNames from 'classnames';
 
-export default function StatusIcon(props: { status: string }) {
-  const className = 'icon-status-' + props.status.toLowerCase();
+export default function StatusIcon(props: { status: string, className?: string }) {
+  const className = classNames('icon-status-' + props.status.toLowerCase(), props.className);
   return <i className={className} />;
 }

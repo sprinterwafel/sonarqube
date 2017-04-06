@@ -20,13 +20,15 @@
 // @flow
 import React from 'react';
 import classNames from 'classnames';
+import Tooltip from '../controls/Tooltip';
 
 type Props = {
   active?: string,
   children?: React.Component<*>,
   item: string,
   onSelect?: (string) => void,
-  onHover?: (string) => void
+  onHover?: (string) => void,
+  title?: string
 };
 
 export default class SelectListItem extends React.PureComponent {
@@ -41,7 +43,7 @@ export default class SelectListItem extends React.PureComponent {
     this.props.onHover && this.props.onHover(this.props.item);
   };
 
-  render() {
+  renderLink() {
     let children = this.props.item;
     if (this.props.hasOwnProperty('children')) {
       children = this.props.children;
@@ -58,5 +60,17 @@ export default class SelectListItem extends React.PureComponent {
         </a>
       </li>
     );
+  }
+
+  render() {
+    if (this.props.title) {
+      return (
+        <Tooltip placement="right" overlay={this.props.title}>
+          {this.renderLink()}
+        </Tooltip>
+      );
+    } else {
+      return this.renderLink();
+    }
   }
 }
