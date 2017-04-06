@@ -19,17 +19,50 @@
  */
 // @flow
 import React from 'react';
-import './PageSide.css';
+import { css, media } from 'glamor';
 
 type Props = {
   children?: React.Element<*>,
   top?: number
 };
 
+const width = css(
+  {
+    width: 'calc(50vw - 360px)'
+  },
+  media('(max-width: 1320px)', { width: 300 })
+);
+
+const sideStyles = css(width, {
+  flexGrow: 0,
+  flexShrink: 0,
+  borderRight: '1px solid #e6e6e6',
+  backgroundColor: '#f3f3f3'
+});
+
+const sideStickyStyles = css(width, {
+  position: 'fixed',
+  top: 0,
+  bottom: 0,
+  left: 0,
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  backgroundColor: '#f3f3f3'
+});
+
+const sideInnerStyles = css(
+  {
+    width: 300,
+    marginLeft: 'calc(50vw - 660px)',
+    backgroundColor: '#f3f3f3'
+  },
+  media('(max-width: 1320px)', { marginLeft: 0 })
+);
+
 const PageSide = (props: Props) => (
-  <div className="layout-page-side">
-    <div className="layout-page-side-sticky" style={{ top: props.top || 30 }}>
-      <div className="layout-page-side-inner">
+  <div className={sideStyles}>
+    <div className={sideStickyStyles} style={{ top: props.top || 30 }}>
+      <div className={sideInnerStyles}>
         {props.children}
       </div>
     </div>

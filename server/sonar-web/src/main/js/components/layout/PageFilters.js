@@ -19,14 +19,14 @@
  */
 // @flow
 import React from 'react';
-import './PageFilters.css';
+import { css } from 'glamor';
 
 type Props = {
   children?: React.Element<*>
 };
 
 const PageSide = (props: Props) => (
-  <div className="layout-page-filters">
+  <div className={css({ width: 260, padding: 20 })}>
     {props.children}
   </div>
 );

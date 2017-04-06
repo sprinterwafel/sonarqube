@@ -19,16 +19,22 @@
  */
 // @flow
 import React from 'react';
-import classNames from 'classnames';
-import './Page.css';
+import { css } from 'glamor';
 
 type Props = {
   className?: string,
   children?: React.Element<*>
 };
 
+const styles = css({
+  display: 'flex',
+  alignItems: 'stretch',
+  width: '100%',
+  flexGrow: 1
+});
+
 const Page = ({ className, children, ...other }: Props) => (
-  <div className={classNames('layout-page', className)} {...other}>
+  <div className={styles + (className ? ` ${className}` : '')} {...other}>
     {children}
   </div>
 );
