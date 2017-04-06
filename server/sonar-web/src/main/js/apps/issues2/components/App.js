@@ -131,6 +131,7 @@ export default class App extends React.PureComponent {
       facets: [
         'assignees',
         'authors',
+        'createdAt',
         'directories',
         'fileUuids',
         'languages',

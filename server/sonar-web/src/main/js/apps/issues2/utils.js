@@ -26,6 +26,10 @@ export type Query = {|
   assigned: boolean,
   assignees: Array<string>,
   authors: Array<string>,
+  createdAfter: string,
+  createdAt: string,
+  createdBefore: string,
+  createdInLast: string,
   directories: Array<string>,
   files: Array<string>,
   languages: Array<string>,
@@ -35,6 +39,7 @@ export type Query = {|
   resolutions: Array<string>,
   rules: Array<string>,
   severities: Array<string>,
+  sinceLeakPeriod: boolean,
   statuses: Array<string>,
   tags: Array<string>,
   types: Array<string>
@@ -43,12 +48,18 @@ export type Query = {|
 const parseAsBoolean = (value: ?string, defaultValue: boolean = true): boolean =>
   value === 'false' ? false : value === 'true' ? true : defaultValue;
 
+const parseAsString = (value: ?string): string => value || '';
+
 const parseAsStringArray = (value: ?string): Array<string> => value ? value.split(',') : [];
 
 export const parseQuery = (query: RawQuery): Query => ({
   assigned: parseAsBoolean(query.assigned),
   assignees: parseAsStringArray(query.assignees),
   authors: parseAsStringArray(query.authors),
+  createdAfter: parseAsString(query.createdAfter),
+  createdAt: parseAsString(query.createdAt),
+  createdBefore: parseAsString(query.createdBefore),
+  createdInLast: parseAsString(query.createdInLast),
   directories: parseAsStringArray(query.directories),
   files: parseAsStringArray(query.fileUuids),
   languages: parseAsStringArray(query.languages),
@@ -58,12 +69,15 @@ export const parseQuery = (query: RawQuery): Query => ({
   resolutions: parseAsStringArray(query.resolutions),
   rules: parseAsStringArray(query.rules),
   severities: parseAsStringArray(query.severities),
+  sinceLeakPeriod: parseAsBoolean(query.sinceLeakPeriod, false),
   statuses: parseAsStringArray(query.statuses),
   tags: parseAsStringArray(query.tags),
   types: parseAsStringArray(query.types)
 });
 
 export const getOpen = (query: RawQuery) => query.open;
+
+const serializeString = (value: string): ?string => value || undefined;
 
 const serializeValue = (value: Array<string>): ?string => value.length ? value.join() : undefined;
 
@@ -72,6 +86,10 @@ export const serializeQuery = (query: Query): RawQuery => {
     assigned: query.assigned ? undefined : 'false',
     assignees: serializeValue(query.assignees),
     authors: serializeValue(query.authors),
+    createdAfter: serializeString(query.createdAfter),
+    createdAt: serializeString(query.createdAt),
+    createdBefore: serializeString(query.createdBefore),
+    createdInLast: serializeString(query.createdInLast),
     directories: serializeValue(query.directories),
     fileUuids: serializeValue(query.files),
     languages: serializeValue(query.languages),
@@ -80,6 +98,7 @@ export const serializeQuery = (query: Query): RawQuery => {
     resolved: query.resolved ? undefined : 'false',
     resolutions: serializeValue(query.resolutions),
     severities: serializeValue(query.severities),
+    sinceLeakPeriod: query.sinceLeakPeriod ? 'true' : undefined,
     statuses: serializeValue(query.statuses),
     rules: serializeValue(query.rules),
     tags: serializeValue(query.tags),

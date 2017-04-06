@@ -21,6 +21,7 @@
 import React from 'react';
 import AssigneeFacet from './AssigneeFacet';
 import AuthorFacet from './AuthorFacet';
+import CreationDateFacet from './CreationDateFacet';
 import DirectoryFacet from './DirectoryFacet';
 import FileFacet from './FileFacet';
 import LanguageFacet from './LanguageFacet';
@@ -88,6 +89,17 @@ export default class Sidebar extends React.PureComponent {
           open={!!openFacets.statuses}
           stats={facets.statuses}
           statuses={query.statuses}
+        />
+        <CreationDateFacet
+          createdAfter={query.createdAfter}
+          createdAt={query.createdAt}
+          createdBefore={query.createdBefore}
+          createdInLast={query.createdInLast}
+          onChange={this.props.onFilterChange}
+          onToggle={this.props.onFacetToggle}
+          open={!!openFacets.createdAt}
+          sinceLeakPeriod={query.sinceLeakPeriod}
+          stats={facets.createdAt}
         />
         <RuleFacet
           languages={query.languages}
