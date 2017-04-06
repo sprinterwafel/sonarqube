@@ -47,19 +47,27 @@ type State = {
 };
 
 export default class ChangelogPopup extends React.PureComponent {
+  mounted: boolean;
   props: Props;
   state: State = {
     changelogs: []
   };
 
   componentDidMount() {
+    this.mounted = true;
     this.loadChangelog();
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
   }
 
   loadChangelog() {
     getIssueChangelog(this.props.issue.key).then(
       changelogs => {
-        this.setState({ changelogs });
+        if (this.mounted) {
+          this.setState({ changelogs });
+        }
       },
       this.props.onFail
     );
@@ -67,6 +75,7 @@ export default class ChangelogPopup extends React.PureComponent {
 
   render() {
     const { issue } = this.props;
+    const { author } = issue;
     return (
       <BubblePopup position={this.props.popupPosition} customClass="bubble-popup-bottom-right">
         <div className="issue-changelog">
@@ -78,10 +87,7 @@ export default class ChangelogPopup extends React.PureComponent {
                 </td>
                 <td className="thin text-left text-top nowrap" />
                 <td className="text-left text-top">
-                  {issue.author
-                    ? //$FlowFixMe doesn't see that issue.author is always defined at this point
-                      `${translate('created_by')} ${issue.author}`
-                    : translate('created')}
+                  {author ? `${translate('created_by')} ${author}` : translate('created')}
                 </td>
               </tr>
 
@@ -91,8 +97,10 @@ export default class ChangelogPopup extends React.PureComponent {
                     {moment(item.creationDate).format('LLL')}
                   </td>
                   <td className="thin text-left text-top nowrap">
-                    {item.userName && item.avatar && <Avatar hash={item.avatar} size={16} />}
-                    {' '}{item.userName}
+                    {item.userName &&
+                      item.avatar &&
+                      <Avatar className="little-spacer-right" hash={item.avatar} size={16} />}
+                    {item.userName}
                   </td>
                   <td className="text-left text-top">
                     {item.diffs.map(diff => <IssueChangelogDiff key={diff.key} diff={diff} />)}

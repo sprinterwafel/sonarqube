@@ -28,7 +28,7 @@ export default class IssueMessage extends React.PureComponent {
     organization: string
   };
 
-  onClick = (e: MouseEvent) => {
+  handleClick = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const Workspace = require('../../workspace/main').default;
@@ -45,7 +45,7 @@ export default class IssueMessage extends React.PureComponent {
         <button
           className="button-link issue-rule icon-ellipsis-h"
           aria-label={translate('issue.rule_details')}
-          onClick={this.onClick}
+          onClick={this.handleClick}
         />
       </div>
     );

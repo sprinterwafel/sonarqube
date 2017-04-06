@@ -188,7 +188,11 @@ export default class IssueView extends React.PureComponent {
                       <button className={classNames(btnClass, 'js-issue-assign')}>
                         {issue.assignee &&
                           <span className="text-top">
-                            <Avatar hash={issue.assigneeAvatar} size={16} />{' '}
+                            <Avatar
+                              className="little-spacer-right"
+                              hash={issue.assigneeAvatar}
+                              size={16}
+                            />
                           </span>}
                         <span className="issue-meta-label">
                           {issue.assignee ? issue.assigneeName : translate('unassigned')}
@@ -199,7 +203,11 @@ export default class IssueView extends React.PureComponent {
                     <li className="issue-meta">
                       {issue.assignee &&
                         <span className="text-top">
-                          <Avatar hash={issue.assigneeAvatar} size={16} />{' '}
+                          <Avatar
+                            className="little-spacer-right"
+                            hash={issue.assigneeAvatar}
+                            size={16}
+                          />
                         </span>}
                       <span className="issue-meta-label">
                         {issue.assignee ? issue.assigneeName : translate('unassigned')}
@@ -257,7 +265,8 @@ export default class IssueView extends React.PureComponent {
             {issue.comments.map(comment => (
               <div className="issue-comment" key={comment.key} data-comment-key={comment.key}>
                 <div className="issue-comment-author" title={comment.authorName}>
-                  <Avatar hash={comment.authorAvatar} size={16} />{' '}{comment.authorName}
+                  <Avatar className="little-spacer-right" hash={comment.authorAvatar} size={16} />
+                  {comment.authorName}
                 </div>
                 <div className="issue-comment-text markdown">{comment.htmlText}</div>
                 <div className="issue-comment-age">({moment(comment.createdAt).fromNow()})</div>

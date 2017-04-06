@@ -29,21 +29,20 @@ type Props = {
 export default class IssueChangelog extends React.PureComponent {
   props: Props;
 
-  onClick = (evt: SyntheticInputEvent) => {
+  handleClick = (evt: SyntheticInputEvent) => {
     evt.preventDefault();
     evt.stopPropagation();
     this.props.onClick();
   };
 
   render() {
-    const { creationDate } = this.props;
-    const formatedCreationDate = moment(creationDate).format('LLL');
+    const momentCreationDate = moment(this.props.creationDate);
     return (
       <button
         className="button-link issue-action issue-action-with-options js-issue-show-changelog"
-        title={formatedCreationDate}
-        onClick={this.onClick}>
-        <span className="issue-meta-label">{moment(creationDate).fromNow()}</span>
+        title={momentCreationDate.format('LLL')}
+        onClick={this.handleClick}>
+        <span className="issue-meta-label">{momentCreationDate.fromNow()}</span>
         {' '}
         <i className="icon-dropdown" />
       </button>

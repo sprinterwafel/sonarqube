@@ -32,13 +32,13 @@ export default function IssueChangelogDiff(props: { diff: ChangelogDiff }) {
   const { diff } = props;
   if (diff.key === 'file') {
     return (
-      <span>
+      <p>
         {translateWithParameters(
           'issue.change.file_move',
           diff.oldValue || '',
           diff.newValue || ''
         )}
-      </span>
+      </p>
     );
   }
 
@@ -67,5 +67,5 @@ export default function IssueChangelogDiff(props: { diff: ChangelogDiff }) {
     }
     message += ` (${translateWithParameters('issue.changelog.was', oldValue)})`;
   }
-  return <span>{message}</span>;
+  return <p>{message}</p>;
 }
